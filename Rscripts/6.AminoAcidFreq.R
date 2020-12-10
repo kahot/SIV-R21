@@ -35,9 +35,9 @@ for (i in 1:length(list.animal)){
 }
 monkeys<-names(monkeyList)
 
-
-
-
+j=8
+j=1
+i=1
 
 #calculate the % diversity from consensus per codon. Average over the 3 bases?
 for (j in 1:length(monkeyList)){
@@ -49,7 +49,7 @@ for (j in 1:length(monkeyList)){
     Plots<-list()
     for (i in 1:length(Ov)){
         df<-Ov[[i]]
-        #df.org<-df
+        
         #calculate total ns freq at each position
         df$ns1<-as.numeric(apply(df[,c("Type","freq.Ts.ref")],1, function(x) if (x["Type"]=="nonsyn") x["freq.Ts.ref"] else 0))
         df$ns2<-as.numeric(apply(df[,c("Type.tv1","freq.transv1.ref")],1, function(x) if (x["Type.tv1"]=="nonsyn") x=x["freq.transv1.ref"] else 0))
@@ -61,8 +61,6 @@ for (j in 1:length(monkeyList)){
         df$syn3<-as.numeric(apply(df[,c("Type.tv2","freq.transv2.ref")],1, function(x) if (x["Type.tv2"]=="syn") x=x["freq.transv2.ref"] else 0))
         df$syn<-df$syn1+df$syn2+df$syn3
     
-        #df.org$ns<-df$ns
-        #df.org$sy<-df$syn
         
         #add codon position based on ref239
         k=96/3
@@ -75,14 +73,16 @@ for (j in 1:length(monkeyList)){
                 k=k+1
             }
         }
-        
+        df2<-df[df$ns>=0.05&df$TotalReads>=100,]
+        missing<-df[df$TotalReads<100|is.na(df$TotalReads),]
+        missing<-missing[missing$merged.pos>=95,]
         #eliminate noise/seq errors
         df2<-df[df$ns>=0.05&df$TotalReads>=100,c("codon.pos","ref251.pos","ns")]
         colnames(df2)[3]<-"freq"
         df2$Type<-"nonsyn"
         df2<-df2[!is.na(df2$freq),]
         #if(nrow(df2)==0) df2[1,1:3]<-c(1,1,0): df2[1,4]<-"nonsyn"
-        df3<-df[df$syn>=0.05,c("codon.pos","ref251.pos","syn")]
+        df3<-df[df$syn>=0.05&df$TotalReads>=100,c("codon.pos","ref251.pos","syn")]
         colnames(df3)[3]<-"freq"
         df3$Type<-"syn"
         df3<-df3[!is.na(df3$freq),]
@@ -99,6 +99,9 @@ for (j in 1:length(monkeyList)){
             if (unique(mut2$Type)=="syn") col='red'
             if (i==1){
                 p<-ggplot(data=mut2, aes(x=codon.pos, y=value))+
+                    geom_rect(data=missing, inherit.aes=FALSE,
+                              aes(xmin=codon.pos,xmax=codon.pos,ymin=-Inf,ymax=Inf),
+                              color="gray80",size=1,alpha=0.2)+
                     geom_bar(stat = "identity", width=0.1, color=col)+
                     scale_x_continuous(breaks=c(50,75,100,125,150,175,200,225,250,275), limits=c(30,280))+
                     scale_y_continuous(breaks=c(0,0.25,0.5,0.75,1), limits=c(0,1.1))+
@@ -108,8 +111,8 @@ for (j in 1:length(monkeyList)){
                     xlab("Codon position")+
                     theme(legend.title = element_blank())+
                     geom_text(aes(label=codon.pos), hjust=0.3, vjust=-.8, size=2.5)+
-                    geom_text(aes(label=ref251.pos), hjust=-0.4, vjust=0, size=2.5, color="gray")+
-                    ggtitle(paste0("Animal:", monkey," Week",sample$Week[i] ))+
+                    geom_text(aes(label=ref251.pos), hjust=-0.4, vjust=0, size=2.5, color="gray30")+
+                    ggtitle(paste0("Animal:", monkey," Week",sample$Week[i],"; ",sample$Sample[i] ))+
                     annotate(geom="text", x=36, y=1, hjust=0,label="nonsyn",color ='blue', size=2.5)+
                     annotate(geom="text", x=36,  y=.9, hjust=0, label="syn",color ='red', size=2.5)+
                     annotate("segment", x = 30, xend = 34, y = 1, yend = 1, colour = "blue") +
@@ -117,6 +120,9 @@ for (j in 1:length(monkeyList)){
                 }
             else {
                 p<-ggplot(data=mut2, aes(x=codon.pos, y=value))+
+                    geom_rect(data=missing, inherit.aes=FALSE,
+                              aes(xmin=codon.pos,xmax=codon.pos,ymin=-Inf,ymax=Inf),
+                              color="gray80",size=1,alpha=0.2)+
                     geom_bar(stat = "identity", width=0.1, color=col)+
                     scale_x_continuous(breaks=c(50,75,100,125,150,175,200,225,250,275), limits=c(30,280))+
                     scale_y_continuous(breaks=c(0,0.25,0.5,0.75,1), limits=c(0,1.1))+
@@ -126,13 +132,16 @@ for (j in 1:length(monkeyList)){
                     xlab("Codon position")+
                     theme(legend.title = element_blank())+
                     geom_text(aes(label=codon.pos), hjust=0.3, vjust=-.8, size=2.5)+
-                    geom_text(aes(label=ref251.pos), hjust=-0.4, vjust=0, size=2.5, color="gray")+
-                    ggtitle(paste0("Animal:", monkey," Week",sample$Week[i] ))
+                    geom_text(aes(label=ref251.pos), hjust=-0.4, vjust=0, size=2.5, color="gray30")+
+                    ggtitle(paste0("Animal:", monkey," Week",sample$Week[i],"; ",sample$Sample[i] ))
             }
         }
         else{
             if (i==1){
                 p<-ggplot(data=mut2, aes(x=codon.pos, y=value, color=Type, fill=Type))+
+                    geom_rect(data=missing, inherit.aes=FALSE,
+                              aes(xmin=codon.pos,xmax=codon.pos,ymin=-Inf,ymax=Inf),
+                              color="gray80",size=1,alpha=0.2)+
                     geom_bar(stat = "identity", width=0.1)+
                     scale_color_manual(values=c("red","blue"),guide = 'none')+
                     scale_fill_manual(values=c("red","blue"),guide = 'none')+
@@ -144,15 +153,19 @@ for (j in 1:length(monkeyList)){
                     xlab("Codon position")+
                     theme(legend.title = element_blank())+
                     geom_text(aes(label=codon.pos), hjust=0.3, vjust=-.8, size=2.5)+
-                    geom_text(aes(label=ref251.pos), hjust=-0.4, vjust=0, size=2.5, color="gray")+
-                    ggtitle(paste0("Animal:", monkey," Week",sample$Week[i] ))+
+                    geom_text(aes(label=ref251.pos), hjust=-0.4, vjust=0, size=2.5, color="gray30")+
+                    ggtitle(paste0("Animal:", monkey," Week",sample$Week[i],"; ",sample$Sample[i] ))+
                     annotate(geom="text", x=36, y=1, hjust=0,label="nonsyn",color ='blue', size=2.5)+
                     annotate(geom="text", x=36,  y=.9, hjust=0, label="syn",color ='red', size=2.5)+
                     annotate("segment", x = 30, xend = 34, y = 1, yend = 1, colour = "blue") +
-                    annotate("segment", x = 30, xend = 34, y = .9, yend = .9, colour = "red") 
+                    annotate("segment", x = 30, xend = 34, y = .9, yend = .9, colour = "red")+
+                    annotate("rect",xmin=cds, xmax=cds, ymin=-1, ymax=1.1, alpha=0.2)
                 }
             else {
                 p<-ggplot(data=mut2, aes(x=codon.pos, y=value, color=Type, fill=Type))+
+                    geom_rect(data=missing, inherit.aes=FALSE,
+                              aes(xmin=codon.pos,xmax=codon.pos,ymin=-Inf,ymax=Inf),
+                              color="gray80",size=1,alpha=0.2)+
                     geom_bar(stat = "identity", width=0.1)+
                     scale_color_manual(values=c("red","blue"),guide = 'none')+
                     scale_fill_manual(values=c("red","blue"),guide = 'none')+
@@ -164,8 +177,8 @@ for (j in 1:length(monkeyList)){
                     xlab("Codon position")+
                     theme(legend.title = element_blank())+
                     geom_text(aes(label=codon.pos), hjust=0.3, vjust=-.8, size=2.5)+
-                    geom_text(aes(label=ref251.pos), hjust=-0.4, vjust=0, size=2.5, color="gray")+
-                    ggtitle(paste0("Animal:", monkey," Week",sample$Week[i] ))
+                    geom_text(aes(label=ref251.pos), hjust=-0.4, vjust=0, size=2.5, color="gray30")+
+                    ggtitle(paste0("Animal:", monkey," Week",sample$Week[i],"; ",sample$Sample[i] ))
             }
         }
         #ggplotly(p)
@@ -173,11 +186,154 @@ for (j in 1:length(monkeyList)){
         Plots[[i]]<-p
     }
 
-    pdf(paste0("Output/MF/Animal",monkey,".pdf"), width = 4, height=nrow(sample)*2)
+    pdf(paste0("Output/MF/Animal_shaded",monkey,".pdf"), width = 4, height=nrow(sample)*2)
     do.call(grid.arrange, c(Plots, ncol=1))
     dev.off()
 
 }
 
 
-#####################
+#stock virus
+Plots<-list()
+Ov<-OvDF[stocks$filename]
+i=1
+df<-Ov[[i]]
+
+#calculate total ns freq at each position
+df$ns1<-as.numeric(apply(df[,c("Type","freq.Ts.ref")],1, function(x) if (x["Type"]=="nonsyn") x["freq.Ts.ref"] else 0))
+df$ns2<-as.numeric(apply(df[,c("Type.tv1","freq.transv1.ref")],1, function(x) if (x["Type.tv1"]=="nonsyn") x=x["freq.transv1.ref"] else 0))
+df$ns3<-as.numeric(apply(df[,c("Type.tv2","freq.transv2.ref")],1, function(x) if (x["Type.tv2"]=="nonsyn") x=x["freq.transv2.ref"] else 0))
+df$ns<-df$ns1+df$ns2+df$ns3
+#calculate total syn freq at each position
+df$syn1<-as.numeric(apply(df[,c("Type","freq.Ts.ref")],1, function(x) if (x["Type"]=="syn") x["freq.Ts.ref"] else 0))
+df$syn2<-as.numeric(apply(df[,c("Type.tv1","freq.transv1.ref")],1, function(x) if (x["Type.tv1"]=="syn") x=x["freq.transv1.ref"] else 0))
+df$syn3<-as.numeric(apply(df[,c("Type.tv2","freq.transv2.ref")],1, function(x) if (x["Type.tv2"]=="syn") x=x["freq.transv2.ref"] else 0))
+df$syn<-df$syn1+df$syn2+df$syn3
+
+missing<-df[df$TotalReads<100|is.na(df$TotalReads),]
+missing<-missing[missing$merged.pos>=95,]
+
+#add codon position based on ref239
+k=96/3
+df$codon.pos<-NA
+for (j in 1:nrow(df)){
+    if (is.na(df$ref239.pos[j])) df$codon.pos[j]<-NA: next
+    if (df$ref239.pos[j]%%3==1|df$ref239.pos[j]%%3==2) df$codon.pos[j]<-k
+    if (df$ref239.pos[j]%%3==0) {
+        df$codon.pos[j]<-k
+        k=k+1
+    }
+}
+
+#eliminate noise/seq errors
+df2<-df[df$ns>=0.05&df$TotalReads>=100,c("codon.pos","ref251.pos","ns")]
+colnames(df2)[3]<-"freq"
+df2$Type<-"nonsyn"
+df2<-df2[!is.na(df2$freq),]
+#if(nrow(df2)==0) df2[1,1:3]<-c(1,1,0): df2[1,4]<-"nonsyn"
+df3<-df[df$syn>=0.05&df$TotalReads>=100,c("codon.pos","ref251.pos","syn")]
+colnames(df3)[3]<-"freq"
+df3$Type<-"syn"
+df3<-df3[!is.na(df3$freq),]
+#if(nrow(df3)==0) df3[1,1:3]<-c(1,1,0); df3[1,4]<-"syn"
+
+mut<-rbind(df2,df3)
+mut2<-melt(mut, id.vars=c("codon.pos","ref251.pos","Type"))
+mut2<-mut2[,-which(colnames(mut2)=="variable")]
+mut2$Type<-factor(mut2$Type, levels=c("syn", "nonsyn"))
+ggplot(data=mut2, aes(x=codon.pos, y=value, color=Type, fill=Type))+
+    geom_rect(data=missing, inherit.aes=FALSE,
+              aes(xmin=codon.pos,xmax=codon.pos,ymin=-Inf,ymax=Inf),
+              color="gray80",size=1,alpha=0.2)+
+    geom_bar(stat = "identity", width=0.1)+
+    scale_color_manual(values=c("red","blue"),guide = 'none')+
+    scale_fill_manual(values=c("red","blue"),guide = 'none')+
+    scale_x_continuous(breaks=c(50,75,100,125,150,175,200,225,250,275), limits=c(30,280))+
+    scale_y_continuous(breaks=c(0,0.25,0.5,0.75,1), limits=c(0,1.1))+
+    theme_bw()+
+    theme(panel.grid.major.x=element_blank(),panel.grid.minor.x=element_blank())+
+    ylab("Diversity")+
+    xlab("Codon position")+
+    theme(legend.title = element_blank())+
+    geom_text(aes(label=codon.pos), hjust=0.3, vjust=-.8, size=2.5)+
+    geom_text(aes(label=ref251.pos), hjust=-0.4, vjust=0, size=2.5, color="gray")+
+    ggtitle(paste0("Stock virus ", i))+
+    annotate(geom="text", x=36, y=1, hjust=0,label="nonsyn",color ='blue', size=2.5)+
+    annotate(geom="text", x=36,  y=.9, hjust=0, label="syn",color ='red', size=2.5)+
+    annotate("segment", x = 30, xend = 34, y = 1, yend = 1, colour = "blue") +
+    annotate("segment", x = 30, xend = 34, y = .9, yend = .9, colour = "red") 
+ggsave("Output/MF/Stock_virus.pdf", width = 4, height = 2)
+
+
+
+########
+## Control ##    
+       
+df1<-read.csv("Output/Control_overview.csv", row.names = 1, stringsAsFactors = F)
+df<-df1[!is.na(df1$Type),]
+#calculate total ns freq at each position
+df$ns1<-as.numeric(apply(df[,c("Type","freq.Ts")],1, function(x) if (x["Type"]=="nonsyn") x["freq.Ts"] else 0))
+df$ns2<-as.numeric(apply(df[,c("Type.tv1","freq.transv1")],1, function(x) if (x["Type.tv1"]=="nonsyn") x=x["freq.transv1"] else 0))
+df$ns3<-as.numeric(apply(df[,c("Type.tv2","freq.transv2")],1, function(x) if (x["Type.tv2"]=="nonsyn") x=x["freq.transv2"] else 0))
+df$ns<-df$ns1+df$ns2+df$ns3
+#calculate total syn freq at each position
+df$syn1<-as.numeric(apply(df[,c("Type","freq.Ts")],1, function(x) if (x["Type"]=="syn") x["freq.Ts"] else 0))
+df$syn2<-as.numeric(apply(df[,c("Type.tv1","freq.transv1")],1, function(x) if (x["Type.tv1"]=="syn") x=x["freq.transv1"] else 0))
+df$syn3<-as.numeric(apply(df[,c("Type.tv2","freq.transv2")],1, function(x) if (x["Type.tv2"]=="syn") x=x["freq.transv2"] else 0))
+df$syn<-df$syn1+df$syn2+df$syn3
+
+df<-merge(df1[,c("merged.pos", "ref251")], df, by="merged.pos", all.x=T)
+df<-df[order(df$merged.pos),]
+#add codon position based on ref239
+k=96/3
+df$codon.pos<-NA
+for (j in 1:nrow(df)){
+    if (is.na(df$ref239.pos[j])) df$codon.pos[j]<-NA: next
+    if (df$ref239.pos[j]%%3==1|df$ref239.pos[j]%%3==2) df$codon.pos[j]<-k
+    if (df$ref239.pos[j]%%3==0) {
+        df$codon.pos[j]<-k
+        k=k+1
+    }
+}
+missing<-df[df$TotalReads<100|is.na(df$TotalReads),]
+missing<-missing[missing$merged.pos>=95,]
+
+
+#eliminate noise/seq errors
+df2<-df[df$TotalReads>=100,c("codon.pos","ref251.pos","ns")]
+colnames(df2)[3]<-"freq"
+df2$Type<-"nonsyn"
+df2<-df2[!is.na(df2$freq),]
+
+df3<-df[df$TotalReads>=100,c("codon.pos","ref251.pos","syn")]
+colnames(df3)[3]<-"freq"
+df3$Type<-"syn"
+df3<-df3[!is.na(df3$freq),]
+
+mut<-rbind(df2,df3)
+mut2<-melt(mut, id.vars=c("codon.pos","ref251.pos","Type"))
+mut2<-mut2[,-which(colnames(mut2)=="variable")]
+mut2$Type<-factor(mut2$Type, levels=c("syn", "nonsyn"))
+
+ggplot(data=mut2, aes(x=codon.pos, y=value, color=Type, fill=Type))+
+    geom_rect(data=missing, inherit.aes=FALSE,
+              aes(xmin=codon.pos,xmax=codon.pos,ymin=-Inf,ymax=Inf),
+              color="gray80",size=1,alpha=0.2)+
+    geom_bar(stat = "identity", width=0.1)+
+    scale_color_manual(values=c("red","blue"),guide = 'none')+
+    scale_fill_manual(values=c("red","blue"),guide = 'none')+
+    scale_x_continuous(breaks=c(50,75,100,125,150,175,200,225,250,275), limits=c(30,280))+
+    scale_y_continuous(breaks=c(0,0.25,0.5,0.75,1), limits=c(0,1.1))+
+    theme_bw()+
+    theme(panel.grid.major.x=element_blank(),panel.grid.minor.x=element_blank())+
+    ylab("Diversity")+
+    xlab("Codon position")+
+    theme(legend.title = element_blank())+
+    #geom_text(aes(label=codon.pos), hjust=0.3, vjust=-.8, size=2.5)+
+    #geom_text(aes(label=ref251.pos), hjust=-0.4, vjust=0, size=2.5, color="gray")+
+    ggtitle(paste0("Control"))+
+    annotate(geom="text", x=36, y=1, hjust=0,label="nonsyn",color ='blue', size=2.5)+
+    annotate(geom="text", x=36,  y=.9, hjust=0, label="syn",color ='red', size=2.5)+
+    annotate("segment", x = 30, xend = 34, y = 1, yend = 1, colour = "blue") +
+    annotate("segment", x = 30, xend = 34, y = .9, yend = .9, colour = "red") 
+ggsave("Output/MF/Control.pdf", width = 4, height = 2)

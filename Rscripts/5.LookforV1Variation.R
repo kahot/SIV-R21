@@ -118,7 +118,7 @@ for (i in 1:length(monkeyList)){
     colors<-sapply(mutID, function(x) if (x%in%highF) x=2 else 1)
     Plots[[i]]<-ggplot(freqM, aes(x=Mutation, y=Freq, color=Sample))+
         geom_point(position=position_dodge(width=0.8))+
-        theme_bw()+
+        theme_bw()+ylim(0,0.4)+
         theme(axis.text.x=element_text(angle=90))+
         theme(axis.text.x=element_text(color=colors))+
         theme(
@@ -131,6 +131,6 @@ for (i in 1:length(monkeyList)){
 }    
 
 
-pdf("Output/Table1/All_animals.pdf", width = 12, height=35)
+pdf("Output/Table1/All_animals_2.pdf", width = 12, height=35)
 do.call(grid.arrange, c(Plots, ncol=1))
 dev.off()

@@ -7,13 +7,13 @@ SIVFiles_SeqData<-list.files("Output/SeqData/",pattern="SeqData")
 
 #create the type of mutations infor for ref251 
 RefDF<-read.csv(paste0("Output/SeqData/",SIVFiles_SeqData[1]),stringsAsFactors=FALSE, row.names = 1)
+
 TypeOfSite<-c() 
 TypeOfSite.tv1<-c()
 TypeOfSite.tv2<-c()
-
-for (codon in 1:(nrow(DF)/3)) { 
+for (codon in 1:(nrow(RefDF)/3)) { 
     positions <- c(codon*3-2,codon*3-1, codon*3)  
-    WTcodon <- DF$ref251[positions]  
+    WTcodon <- RefDF$ref251[positions]  
     mutant1codon <- c(transition(WTcodon[1]), WTcodon[2:3])  
     mutant2codon <- c(WTcodon[1],transition(WTcodon[2]), WTcodon[3])
     mutant3codon <- c(WTcodon[1:2], transition(WTcodon[3]))
