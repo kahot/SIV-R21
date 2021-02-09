@@ -148,4 +148,35 @@ for (i in 1:length(Deletion)){
 #24 files have less insertion than the 9 bases
 #deletions are all at the same positions 430,431,432
 
+
+
+##calculate indels for stock virus
+DF<-OvDF[[stock$filename]]
+    
+    #where do the indels occur?
+Ins<-data.frame(ref251.pos=94:834)
+Del<-data.frame(ref251.pos=94:834)
+Deletion<-list()
+Indels<-list()
+
+DF$del.percent<-DF$deletion/DF$TotalReads
+DF$ins.percent<-DF$insertion/DF$TotalReads
+
+df2<-DF[,c("ref251.pos","del.percent","ins.percent")]
+colnames(df2)[2:3]<-c("deletion","insertion")
+dfm<-melt(df2, id.vars="ref251.pos")
+dfm[dfm==0]<-NA
+id<-"Stock"
+ggplot(dfm, aes(x=ref251.pos, y=value, color=variable))+
+    geom_point(size=.5)+
+    scale_color_manual(values=cols[c(2,5)])+
+    facet_grid(rows = vars(variable))+
+    theme_bw()+ylab('Indel observed')+
+    xlab('Env position')+ylim(0,1)+
+    guides(color = guide_legend(title = NULL))+
+    ggtitle(id)+theme(legend.position = "none") 
+ggsave(paste0("Output/Indels/Indel_",id,".pdf"), width=4, height = 2)
+
+write.csv(df2,"Output/Indels/Indels_stockvirus.csv")
+
        

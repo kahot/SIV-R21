@@ -5,7 +5,7 @@ source("Rscripts/baseRscript.R")
 #get the file name
 SIVFiles_SeqData<-list.files("Output/SeqData/",pattern="SeqData")
 
-#create the type of mutations infor for ref251 
+#create the type of mutations infor for "ref" (ref251 with 1 modification)
 RefDF<-read.csv(paste0("Output/SeqData/",SIVFiles_SeqData[1]),stringsAsFactors=FALSE, row.names = 1)
 
 TypeOfSite<-c() 
@@ -13,7 +13,7 @@ TypeOfSite.tv1<-c()
 TypeOfSite.tv2<-c()
 for (codon in 1:(nrow(RefDF)/3)) { 
     positions <- c(codon*3-2,codon*3-1, codon*3)  
-    WTcodon <- RefDF$ref251[positions]  
+    WTcodon <- RefDF$ref[positions]  
     mutant1codon <- c(transition(WTcodon[1]), WTcodon[2:3])  
     mutant2codon <- c(WTcodon[1],transition(WTcodon[2]), WTcodon[3])
     mutant3codon <- c(WTcodon[1:2], transition(WTcodon[3]))
@@ -51,22 +51,22 @@ RefDF$Type.tv2<-TypeOfSite.tv2
 
 for (k in 1:nrow(RefDF)){
     if (k%%3==1){
-        RefDF$WTAA[k] = seqinr::translate(RefDF$ref251[c(k,k+1,k+2)])
-        RefDF$MUTAA[k] =seqinr::translate(c(transition(RefDF$ref251[k]), RefDF$ref251[c(k+1,k+2)]))
-        RefDF$TVS1_AA[k] = seqinr::translate(c(transv1(RefDF$ref251[k]), RefDF$ref251[c(k+1,k+2)]))
-        RefDF$TVS2_AA[k] = seqinr::translate(c(transv2(RefDF$ref251[k]), RefDF$ref251[c(k+1,k+2)]))
+        RefDF$WTAA[k] = seqinr::translate(RefDF$ref[c(k,k+1,k+2)])
+        RefDF$MUTAA[k] =seqinr::translate(c(transition(RefDF$ref[k]), RefDF$ref[c(k+1,k+2)]))
+        RefDF$TVS1_AA[k] = seqinr::translate(c(transv1(RefDF$ref[k]), RefDF$ref[c(k+1,k+2)]))
+        RefDF$TVS2_AA[k] = seqinr::translate(c(transv2(RefDF$ref[k]), RefDF$ref[c(k+1,k+2)]))
     } 
     if (k%%3==2){
-        RefDF$WTAA[k]   = seqinr::translate(  RefDF$ref251[c(k-1,k,k+1)])
-        RefDF$MUTAA[k]  = seqinr::translate(c(RefDF$ref251[c(k-1)],transition(RefDF$ref251[k]),RefDF$ref251[c(k+1)]))
-        RefDF$TVS1_AA[k]= seqinr::translate(c(RefDF$ref251[c(k-1)],transv1(RefDF$ref251[k]),RefDF$ref251[c(k+1)]))
-        RefDF$TVS2_AA[k]= seqinr::translate(c(RefDF$ref251[c(k-1)],transv2(RefDF$ref251[k]),RefDF$ref251[c(k+1)]))
+        RefDF$WTAA[k]   = seqinr::translate(  RefDF$ref[c(k-1,k,k+1)])
+        RefDF$MUTAA[k]  = seqinr::translate(c(RefDF$ref[c(k-1)],transition(RefDF$ref[k]),RefDF$ref[c(k+1)]))
+        RefDF$TVS1_AA[k]= seqinr::translate(c(RefDF$ref[c(k-1)],transv1(RefDF$ref[k]),RefDF$ref[c(k+1)]))
+        RefDF$TVS2_AA[k]= seqinr::translate(c(RefDF$ref[c(k-1)],transv2(RefDF$ref[k]),RefDF$ref[c(k+1)]))
     }
     if (k%%3==0){
-        RefDF$WTAA[k] =    seqinr::translate(  RefDF$ref251[c(k-2,k-1,k)])
-        RefDF$MUTAA[k] =   seqinr::translate(c(RefDF$ref251[c(k-2,k-1)],transition(RefDF$ref251[k])))
-        RefDF$TVS1_AA[k] = seqinr::translate(c(RefDF$ref251[c(k-2,k-1)],transv1(RefDF$ref251[k])))
-        RefDF$TVS2_AA[k] = seqinr::translate(c(RefDF$ref251[c(k-2,k-1)],transv2(RefDF$ref251[k])))
+        RefDF$WTAA[k] =    seqinr::translate(  RefDF$ref[c(k-2,k-1,k)])
+        RefDF$MUTAA[k] =   seqinr::translate(c(RefDF$ref[c(k-2,k-1)],transition(RefDF$ref[k])))
+        RefDF$TVS1_AA[k] = seqinr::translate(c(RefDF$ref[c(k-2,k-1)],transv1(RefDF$ref[k])))
+        RefDF$TVS2_AA[k] = seqinr::translate(c(RefDF$ref[c(k-2,k-1)],transv2(RefDF$ref[k])))
         }
 }
 #Add whether AA change is drastic & makes CpG
@@ -87,7 +87,7 @@ for(j in 1:nrow(RefDF)){
     if (WT != MUT1) RefDF$bigAAChange.tv1[j] <- 1
     if (WT != MUT2) RefDF$bigAAChange.tv2[j] <- 1
     
-    trip <- RefDF$ref251[c(j, j+1,j+2)]
+    trip <- RefDF$ref[c(j, j+1,j+2)]
     if (is.na(trip[1])|is.na(trip[2])|is.na(trip[3])) next
     else {
         if (trip[1] == "c" & trip[2] == "a" ) RefDF$makesCpG[j] <- 1 
@@ -98,16 +98,19 @@ for(j in 1:nrow(RefDF)){
     }
 } 
 
-RefDF<-RefDF[-c(1, 6:14,17:26)]
-write.csv(RefDF, "Output/Ref251_overview.csv")
+RefDF<-RefDF[-c(1, 6:15,17:26)]
+RefDF<-RefDF[order(RefDF$ref251.pos),]
+RefDF$AA251pos<-ceiling(RefDF$ref251.pos/3)
 
+write.csv(RefDF, "Output/Ref_overview.csv")
+#RefDF<-read.csv("Output/Ref_overview.csv", stringsAsFactors = F, row.names = 1)
 
 for (i in 1:length(SIVFiles_SeqData)){   
         id<-gsub(".csv",'',paste(SIVFiles_SeqData[i]))
         id<-gsub("SeqData_",'',id)
         DF<-read.csv(paste0("Output/SeqData/",SIVFiles_SeqData[i]),stringsAsFactors=FALSE, row.names = 1)
                 
-        DF<-merge(DF,RefDF[c(1,7:19)], by="merged.pos")
+        DF<-merge(DF,RefDF[c(1,6:19)], by="ref251.pos")
         write.csv(DF,paste0("Output/Overview/",id,"_overview.csv"))
         print(id)
 }        
@@ -129,7 +132,7 @@ for (i in 1:length(SIVFiles_SeqData)){
         SeqData<-read.csv(paste("Output/SeqData/",SIVFiles_SeqData[i],sep=""))
         ReadsSummary$MaxDepth[i]<-max(SeqData$TotalReads,na.rm=T)
         ReadsSummary$AveDepth[i]<-mean(SeqData$TotalReads,na.rm=T)
-        ReadsSummary$No.ofSites[i]<-nrow(SeqData[!is.na(SeqData$ref251),])
+        ReadsSummary$No.ofSites[i]<-nrow(SeqData[!is.na(SeqData$ref),])
         ReadsSummary$SE[i]<-std.error(SeqData$TotalReads, na.rm=T)
 }
 
@@ -139,8 +142,36 @@ write.csv(ReadsSummary,"Output/ReadsSummary.csv")
 ###
 ReadsSummary<-read.csv("Output/ReadsSummary.csv", row.names = 1)
 ggplot(ReadsSummary, aes(x=SampleID, y=AveDepth))+
+    geom_point(size=0.8)+
+    theme(axis.text.x=element_text(angle=90))+
+    scale_y_continuous(labels = label_scientific())
+ggsave("Output/average.reads.pdf", width = 8, height = 6)    
+
+
+###
+OverviewFiles<-list.files("Output/Overview/",pattern="overview.csv")
+#remove the stock and control
+OverviewFiles<-OverviewFiles[-c(49,25)]
+
+MF<-data.frame(sample=1:length(OverviewFiles))
+for (i in 1:length(OverviewFiles)){ 
+    df<-read.csv(paste0("Output/Overview/",OverviewFiles[i]),stringsAsFactors=FALSE, row.names = 1)
+    df<-df[df$TotalReads>=100,]
+    MF$SampleID[i]<-gsub("_overview.csv",'',OverviewFiles[i])
+    MF$ave.mf[i]<-mean(df$freq.mutations.ref, na.rm=T)
+}
+
+
+Summary<-merge(MF, ReadsSummary[,c("SampleID","AveDepth")], by="SampleID")
+write.csv(Summary,"Output/AveMF_Deapth.summary.csv")
+
+
+ggplot(Summary,aes(x=ave.mf, y=AveDepth))+
     geom_point()+
-    theme(axis.text.x=element_text(angle=90))
+    xlab("Average mutation freq")+ylab("Average read depth")
+ggsave("Output/depth.vs.mf.pdf", width = 4, height = 4)
 
-
-
+cor.test(Summary$ave.mf, Summary$AveDepth, method="spearman")
+#p-value = 0.001636
+#      rho 
+#0.3744246 

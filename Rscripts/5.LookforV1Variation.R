@@ -97,6 +97,16 @@ for (i in 1:length(list.animal)){
 }
 monkeys<-names(monkeyList)
 
+#save data frame with monkey info.
+info<-SampleSheet[,c("filename","Monkey","Sample","Week")]
+colnames(info)[1]<-"ID"
+muts2<-muts
+colnames(muts2)[1]<-"ID"
+table1<-merge(info, muts2,by="ID", all.y = T)
+write.csv(table1,"Output/Table1/AAchanges.summary.csv")
+
+
+
 
 Plots<-list()    
 for (i in 1:length(monkeyList)){

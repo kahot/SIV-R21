@@ -34,7 +34,7 @@ for (i in 1:length(bamfiles)){
 
 library(ape)
 # Create a data frame with merged positions, ref (mac329) positions, and each consensus seq positions 
-con<-read.dna("Data/SIV251_Consensus_aignment.fasta", format = "fasta",as.character=TRUE)
+con<-read.dna("Data/R21_SIV251_Consensus_alignment.fasta", format = "fasta",as.character=T)
 csns<-data.frame(t(con), stringsAsFactors = F)
 csns$merged.pos<-1:nrow(csns)
 colnames(csns)[3:73]<-gsub('_Consensus','',colnames(csns[3:73]))

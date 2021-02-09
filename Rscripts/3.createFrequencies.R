@@ -5,14 +5,35 @@ source("Rscripts/baseRscript.R")
 #######
 SIVFiles<-list.files("Output/CSV/",pattern="csv")
 
+#Trim CSV files 
+
+
 start<-94
 end<-834
-no<-data.frame("merged.pos"=c(start:end))
+no<-data.frame("ref251.pos"=c(start:end))
 
 csns<-read.csv("Consensus_merged.pos.csv", stringsAsFactors = F, row.names = 1)
 csns<-csns[csns$merged.pos>=start & csns$merged.pos<=end,] #741 rows
 
 
+#StockVirus consensus vs. ref251 -how many site are different?
+csns<-read.csv("Consensus_merged.pos.csv", stringsAsFactors = F, row.names = 1)
+csns<-csns[csns$merged.pos>=94 ,] #741 rows
+csns$con_count<-ifelse(csns$ref251==csns$Run_5_01_Animal_stock_virus,0,1)
+
+sum(csns$con_count) #10
+csns$ref251.pos[csns$con_count==1]
+#400 825 826 828 829 830 831 832 833 834
+#400 has only 2 reads, 826 has 3 reads, rest are ?
+#only 1 site differnece @825
+
+cs<-csns[,c("ref251.pos","Run_5_01_Animal_stock_virus.pos","ref251","ref239","Run_5_01_Animal_stock_virus")]
+
+# Replace the pos 825 in of ref251 and call it ref 
+csns$ref<-csns$ref251
+csns$ref[csns$merged.pos==825]<-"c"
+
+#"merged.pos" and "ref251.pos" are same
 for (i in 1:length(SIVFiles)){
     print(i)
     id<-gsub(".csv",'',paste(SIVFiles[i]))
@@ -26,15 +47,15 @@ for (i in 1:length(SIVFiles)){
     SeqData$MajNt<-apply(SeqData[,2:5],1,function(x) c("a","c","g","t")[which.max(x)])
     
     #Add the consensus ref and position info  
-    cons<-csns[,c("merged.pos", "ref251.pos","ref239.pos", paste0(id,".pos"), "ref251")]
+    cons<-csns[,c("ref251.pos","ref239.pos", paste0(id,".pos"), "ref251","ref")]
     
     SeqData<-merge(cons,SeqData,by.y="pos",by.x=paste0(id,".pos"), all.x=T)
     
     #nuceotides from transition mutations
     SeqData$transition.maj<-sapply(SeqData$MajNt, function(x) transition(x))        
-    SeqData$transition.ref<-sapply(SeqData$ref251, function(x) transition(x))
+    SeqData$transition.ref<-sapply(SeqData$ref, function(x) transition(x))
     
-    SeqData<-SeqData[order(SeqData$merged.pos),]
+    SeqData<-SeqData[order(SeqData$ref251.pos),]
     #determine Transition mutation freq of every site.
     
     #i==49 Run6_01 StockVirus ->only one with long indel at merged.pos 412-423
@@ -83,8 +104,8 @@ for (i in 1:length(SIVFiles)){
             SeqData$freq.transv2[k]<-Tvs2Num/SeqData$TotalReads[k]
             Tvs1rNum<-SeqData[k,paste0(transv1(SeqData$ref251[k]))]
             Tvs2rNum<-SeqData[k,paste0(transv2(SeqData$ref251[k]))]
-            SeqData$freq.transv1.ref[k]<-Tvs1Num/SeqData$TotalReads[k]
-            SeqData$freq.transv2.ref[k]<-Tvs2Num/SeqData$TotalReads[k]
+            SeqData$freq.transv1.ref[k]<-Tvs1rNum/SeqData$TotalReads[k]
+            SeqData$freq.transv2.ref[k]<-Tvs2rNum/SeqData$TotalReads[k]
             
             
             #Frequencies of all SNPs (no indels)

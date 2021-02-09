@@ -35,9 +35,6 @@ for (i in 1:length(list.animal)){
 }
 monkeys<-names(monkeyList)
 
-j=8
-j=1
-i=1
 
 #calculate the % diversity from consensus per codon. Average over the 3 bases?
 for (j in 1:length(monkeyList)){
@@ -73,7 +70,7 @@ for (j in 1:length(monkeyList)){
                 k=k+1
             }
         }
-        df2<-df[df$ns>=0.05&df$TotalReads>=100,]
+        #df2<-df[df$ns>=0.05&df$TotalReads>=100,]
         missing<-df[df$TotalReads<100|is.na(df$TotalReads),]
         missing<-missing[missing$merged.pos>=95,]
         #eliminate noise/seq errors
