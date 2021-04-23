@@ -1,0 +1,70 @@
+"","Monkey","Tissue2","Week","Cohort","filename","sample","AA112"
+"1","16314","plasma",3,"Latent R","Run_4_01_Animal_16314","Week3_plasma",0.000847516702683069
+"2","16314","plasma",8,"Latent R","Run_4_02_Animal_16314","Week8_plasma",0.000866675647761462
+"3","16314","pLN",8,"Latent R","Run_4_03_Animal_16314","Week8_pLN",0.0010045332783845
+"4","16314","Thoracic LN",8,"Latent R","Run_4_04_Animal_16314","Week8_Thoracic LN",0.00126544588357898
+"5","16314","Thoracic LN",8,"Latent R","Run_4_05_Animal_16314","Week8_Thoracic LN",0.00185774946921444
+"28","16314","Lung",8,"Latent R","Run_5_05_Animal_16314","Week8_Lung",0.00101094196003806
+"29","16314","Lung",8,"Latent R","Run_5_06_Animal_16314","Week8_Lung",0.00120533535218704
+"30","16314","Lung",8,"Latent R","Run_5_07_Animal_16314","Week8_Lung",0.00053726996560468
+"53","16314","Lung",8,"Latent R","Run_6_07_Animal_16314","Week8_Lung",0
+"54","16314","Thoracic LN",8,"Latent R","Run_6_08_Animal_16314","Week8_Thoracic LN",0.000156372165754496
+"6","20615","plasma",3,"Latent R","Run_4_06_Animal_20615","Week3_plasma",0.0908049778602704
+"7","20615","plasma",6,"Latent R","Run_4_07_Animal_20615","Week6_plasma",0.165752225614312
+"8","20615","pLN",6,"Latent R","Run_4_08_Animal_20615","Week6_pLN",0.182175020774016
+"9","20615","Thoracic LN",6,"Latent R","Run_4_09_Animal_20615","Week6_Thoracic LN",0.194537147397696
+"10","20615","Thoracic LN",6,"Latent R","Run_4_10_Animal_20615","Week6_Thoracic LN",0.216612492933861
+"31","20615","Lung",6,"Latent R","Run_5_08_Animal_20615","Week6_Lung",0.426951722116041
+"34","20615","Lung",6,"Latent R","Run_5_11_Animal_20615","Week6_Lung",0.220295961803958
+"55","20615","Lung",6,"Latent R","Run_6_09_Animal_20615","Week6_Lung",0.366686029625327
+"56","20615","Lung",6,"Latent R","Run_6_10_Animal_20615","Week6_Lung",0.00069395182432224
+"57","20615","Lung",6,"Latent R","Run_6_11_Animal_20615","Week6_Lung",0.391931571556236
+"16","30816","plasma",5,"Latent NR","Run_4_16_Animal_30816","Week5_plasma",0.672879016645516
+"17","30816","plasma",8,"Latent NR","Run_4_17_Animal_30816","Week8_plasma",0.475654529040024
+"18","30816","pLN",8,"Latent NR","Run_4_18_Animal_30816","Week8_pLN",0.698780413066127
+"19","30816","Thoracic LN",8,"Latent NR","Run_4_19_Animal_30816","Week8_Thoracic LN",0.495029639762882
+"20","30816","Thoracic LN",8,"Latent NR","Run_4_20_Animal_30816","Week8_Thoracic LN",0.665084745762712
+"68","30816","Thoracic LN",8,"Latent NR","Run_6_23_Animal_30816","Week8_Thoracic LN",0.7465825446898
+"60","3116","plasma",3,"Latent NR","Run_6_15_Animal_3116","Week3_plasma",0.000561835847064408
+"61","3116","plasma",8,"Latent NR","Run_6_16_Animal_3116","Week8_plasma",0.00048692076717072
+"62","3116","pLN",8,"Latent NR","Run_6_17_Animal_3116","Week8_pLN",0.00616259777198388
+"63","3116","Thoracic LN",8,"Latent NR","Run_6_18_Animal_3116","Week8_Thoracic LN",0.000989119683481701
+"64","3116","Lung",8,"Latent NR","Run_6_19_Animal_3116","Week8_Lung",0.000512970833944013
+"65","3116","Thoracic LN",8,"Latent NR","Run_6_20_Animal_3116","Week8_Thoracic LN",0.00116279069767442
+"48","31316","plasma",5,"Latent R","Run_6_02_Animal_31316","Week5_plasma",0.000463081441401918
+"32","31316","Lung",8,"Latent R","Run_5_09_Animal_31316","Week8_Lung",0.000574528252613357
+"33","31316","Lung",8,"Latent R","Run_5_10_Animal_31316","Week8_Lung",0.000932100093210009
+"49","31316","plasma",8,"Latent R","Run_6_03_Animal_31316","Week8_plasma",0.00120165828843804
+"50","31316","pLN",8,"Latent R","Run_6_04_Animal_31316","Week8_pLN",0.000172950536146662
+"51","31316","Thoracic LN",8,"Latent R","Run_6_05_Animal_31316","Week8_Thoracic LN",0.000658472344161545
+"52","31316","Thoracic LN",8,"Latent R","Run_6_06_Animal_31316","Week8_Thoracic LN",0.00056310441914555
+"21","3216","plasma",3,"Latent NR","Run_4_21_Animal_3216","Week3_plasma",0.000867428600463838
+"22","3216","plasma",8,"Latent NR","Run_4_22_Animal_3216","Week8_plasma",0.00254798709019874
+"23","3216","pLN",9,"Latent NR","Run_4_23_Animal_3216","Week9_pLN",0.00117006505561709
+"24","3216","Thoracic LN",9,"Latent NR","Run_4_24_Animal_3216","Week9_Thoracic LN",0.00169396839127066
+"66","3216","Thoracic LN",9,"Latent NR","Run_6_21_Animal_3216","Week9_Thoracic LN",0.000366636113657195
+"67","3216","Lung",9,"Latent NR","Run_6_22_Animal_3216","Week9_Lung",0.000725821085102522
+"41","3316","plasma",7,"SIV only","Run_5_18_Animal_3316","Week7_plasma",0.000859672227099795
+"42","3316","pLN",7,"SIV only","Run_5_19_Animal_3316","Week7_pLN",0.00119955950601746
+"43","3316","Thoracic LN",7,"SIV only","Run_5_20_Animal_3316","Week7_Thoracic LN",0.00106930181965672
+"11","3516","plasma",3,"Latent R","Run_4_11_Animal_3516","Week3_plasma",0.000828820074593807
+"12","3516","plasma",8,"Latent R","Run_4_12_Animal_3516","Week8_plasma",0.00198337312027605
+"13","3516","pLN",9,"Latent R","Run_4_13_Animal_3516","Week9_pLN",0.00130494220970214
+"14","3516","Thoracic LN",9,"Latent R","Run_4_14_Animal_3516","Week9_Thoracic LN",0.00108112004036181
+"15","3516","Thoracic LN",9,"Latent R","Run_4_15_Animal_3516","Week9_Thoracic LN",0.00140526570828622
+"35","3516","Lung",9,"Latent R","Run_5_12_Animal_3516","Week9_Lung",0.00281425891181989
+"36","3516","Lung",9,"Latent R","Run_5_13_Animal_3516","Week9_Lung",0.00171932692578709
+"58","3516","Lung",9,"Latent R","Run_6_13_Animal_3516","Week9_Lung",0.00399342259807376
+"59","3516","Lung",9,"Latent R","Run_6_14_Animal_3516","Week9_Lung",0.000590667454223272
+"37","3616","plasma",2,"SIV only","Run_5_14_Animal_3616","Week2_plasma",0.000951049483104606
+"38","3616","plasma",7,"SIV only","Run_5_15_Animal_3616","Week7_plasma",0.00062759119090183
+"39","3616","pLN",7,"SIV only","Run_5_16_Animal_3616","Week7_pLN",0.00136353460732238
+"40","3616","Thoracic LN",7,"SIV only","Run_5_17_Animal_3616","Week7_Thoracic LN",0.000833635375135919
+"25","3816","plasma",8,"SIV only","Run_5_02_Animal_3816","Week8_plasma",0.000626974175013095
+"26","3816","pLN",8,"SIV only","Run_5_03_Animal_3816","Week8_pLN",0.00195227191507948
+"27","3816","Thoracic LN",8,"SIV only","Run_5_04_Animal_3816","Week8_Thoracic LN",0.000562942832184801
+"44","3816","Lung",8,"SIV only","Run_5_21_Animal_3816","Week8_Lung",0.00208986415882968
+"45","4016","plasma",8,"SIV only","Run_5_22_Animal_4016","Week8_plasma",0.000675015129649458
+"46","4016","Thoracic LN",8,"SIV only","Run_5_23_Animal_4016","Week8_Thoracic LN",0.00154456668963715
+"47","4016","Lung",8,"SIV only","Run_5_24_Animal_4016","Week8_Lung",0.00202062850594125
+"69","4016","pLN",8,"SIV only","Run_6_24_Animal_4016","Week8_pLN",0.000907610581671605

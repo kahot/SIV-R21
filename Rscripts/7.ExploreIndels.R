@@ -1,10 +1,8 @@
+#Check # of sites and frequency of indels in all samples
+
 library(ggplot2)
 library(reshape2)
 library(gridExtra)
-
-#library(plotly)
-#library(tidyverse)
-#library(htmlwidgets)
 
 library(colorspace)
 cols<-qualitative_hcl(6, palette="Dark3")
@@ -57,8 +55,9 @@ for (j in 1:length(monkeyList)){
     Indels<-list()
     for (i in 1:length(Ov)){
         DF<-Ov[[i]]
-        DF$del.percent<-DF$deletion/DF$TotalReads
-        DF$ins.percent<-DF$insertion/DF$TotalReads
+        DF$TotalReads[DF$TotalReads<100]<-NA
+        DF$del.percent<-DF$deletion/(DF$deletion+DF$insertion+DF$TotalReads)
+        DF$ins.percent<-DF$insertion/(DF$deletion+DF$insertion+DF$TotalReads)
         
         df2<-DF[,c("ref251.pos","del.percent","ins.percent")]
         colnames(df2)[2:3]<-c("deletion","insertion")
@@ -74,8 +73,8 @@ for (j in 1:length(monkeyList)){
             guides(color = guide_legend(title = NULL))+
             ggtitle(id)+theme(legend.position = "none") 
         Plots[[i]]<-p
-        Indels[[i]]<-df2
-        names(Indels)[[i]]<-id
+        #Indels[[i]]<-df2
+        #names(Indels)[[i]]<-id
             
         Ins[,id]<-df2[,"insertion"]
         Del[,id]<-df2[,"deletion"]
@@ -104,19 +103,22 @@ ins.files<-c()
 del.files<-c()
 k=1
 g=1
-pdf("Output/Indels/insertion_reads.pdf", width = 10, height = 40)
+pdf("Output/Indels/insertion_reads2.pdf", width = 10, height = 40)
 par(mfrow=c(15,5))
 
 for (i in 1:length(OvDF)){
     print(names(OvDF[i]))
     DF<-OvDF[[i]]
-#    Plots<-list()
+   
+    #dfI<-DF[DF$ref251.pos %in% c(377:385, 428:433),]
+    #dfI$TotalReads[is.na(dfI$TotalReads)]<--10000
+    #plot(dfI$TotalReads, main=names(OvDF[i]), pch=16, xlab='', ylab='# of reads', ylim=c(10,max(dfI$TotalReads)))
+    
     dfI<-DF[is.na(DF$ref239.pos)&!is.na(DF[,2]),]
-    plot(dfI$TotalReads, main=names(OvDF[i]), pch=16, xlab='', ylab='# of reads', ylim=c(0,max(dfI$TotalReads)))
-
+    
     if (length(is.na(dfI[,2]))!=9) ins.files<-c(ins.files, names(OvDF)[i])
     if (nrow(dfI)>0) {
-        dfI2<-dfI[dfI$freq.mutations.ref>0.05,]
+        dfI2<-dfI[dfI$freq.mutations.ref>0.005,]
         dfI2<-dfI2[!is.na(dfI2$merged.pos),]
         if (nrow(dfI2)>0) {
             Insertion[[k]]<-dfI2
@@ -143,10 +145,20 @@ for (i in 1:length(Deletion)){
     deletion$positions[i]<-paste(d$ref251.pos, collapse = ',')
 }
    
+#24 files have less than 9 bases of insertion (most are simply missing but check!)
+#look at nt430-432 -> 
+#     if missing, check if it was deletion or no reads available.  the pattern 
+In<-OvDF[ins.files]
+check<-data.frame()
+for (i in 1:length(In)){
+    DF<-In[[i]]
+    df<-DF[DF$ref251.pos %in%  428:434,c(1,3,6:13)]
+    df$ID<-ins.files[i]
+    check<-rbind(check, df)
+}
 
+#samples missing 430-432 are due to no reads available
 
-#24 files have less insertion than the 9 bases
-#deletions are all at the same positions 430,431,432
 
 
 
@@ -158,25 +170,50 @@ Ins<-data.frame(ref251.pos=94:834)
 Del<-data.frame(ref251.pos=94:834)
 Deletion<-list()
 Indels<-list()
+DF$TotalReads[DF$TotalReads<100]<-NA
+DF$del.percent<-DF$deletion/(DF$deletion+DF$insertion+DF$TotalReads)
+DF$ins.percent<-DF$insertion/(DF$deletion+DF$insertion+DF$TotalReads)
 
-DF$del.percent<-DF$deletion/DF$TotalReads
-DF$ins.percent<-DF$insertion/DF$TotalReads
-
-df2<-DF[,c("ref251.pos","del.percent","ins.percent")]
-colnames(df2)[2:3]<-c("deletion","insertion")
-dfm<-melt(df2, id.vars="ref251.pos")
+df2<-DF[,c("ref251.pos","AA239pos","del.percent","ins.percent")]
+colnames(df2)[3:4]<-c("deletion","insertion")
+dfm<-melt(df2[,2:4], id.vars="AA239pos")
 dfm[dfm==0]<-NA
 id<-"Stock"
-ggplot(dfm, aes(x=ref251.pos, y=value, color=variable))+
+ggplot(dfm, aes(x=AA239pos, y=value*100, color=variable))+
     geom_point(size=.5)+
     scale_color_manual(values=cols[c(2,5)])+
     facet_grid(rows = vars(variable))+
-    theme_bw()+ylab('Indel observed')+
-    xlab('Env position')+ylim(0,1)+
+    theme_bw()+ylab('Frequency (%)')+
+    xlab('Env position')+ylim(0,100)+
+    scale_x_continuous(breaks=c(50,100,150,200,250), limits=c(30,280))+
     guides(color = guide_legend(title = NULL))+
-    ggtitle(id)+theme(legend.position = "none") 
+    #ggtitle(id)+
+    theme(legend.position = "none") 
 ggsave(paste0("Output/Indels/Indel_",id,".pdf"), width=4, height = 2)
+ggsave(paste0("Output/Indels/Indel_",id,".png"), width=4, height = 2, dpi=300, unit="in")
 
 write.csv(df2,"Output/Indels/Indels_stockvirus.csv")
 
-       
+#mean insertion freq
+mean(df2$insertion, na.rm = T)
+#1.173424e-06
+mean(df2$deletion, na.rm = T)
+#9.761222e-05
+    
+insertFreq<-c()
+delFreq<-c()
+for (i in 1:length(monkeys)){
+    monkey<-monkeys[i]
+    ins<-read.csv(paste0("Output/Indels/Insertion_", monkey, ".csv"), row.names = 1, stringsAsFactors = F)  
+    del<-read.csv(paste0("Output/Indels/Deletion_", monkey, ".csv"), row.names = 1, stringsAsFactors = F)
+    aveI<-colMeans(ins[2:(ncol(ins)-2)], na.rm=T)
+    aveD<-colMeans(del[2:(ncol(ins)-2)], na.rm=T)
+    insertFreq<-c(insertFreq,aveI)
+    delFreq<-c(delFreq,aveD)
+    
+}
+
+mean(insertFreq) #3.041616e-06
+mean(delFreq) #0.0001027706
+max(insertFreq) # 1.071345e-05
+max(delFreq) # 0.0003195672
