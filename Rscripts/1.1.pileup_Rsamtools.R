@@ -67,7 +67,6 @@ for (i in 1:73){
 }
 
 
-#write.csv(csns,"Consensus_merged.pos.csv")
 cs<-csns[,74:ncol(csns)]
 write.csv(cs,"merged.pos.csv")
 
