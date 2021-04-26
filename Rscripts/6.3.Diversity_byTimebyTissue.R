@@ -228,15 +228,15 @@ colnames(infec)[2]<-"Tissue"
 #Divide the plasam to earlier time points vs. at the end
 infec$Tissue[infec$Tissue=="plasma"]<-"Plasma"
 infec$Tissue[infec$Tissue=="Plasma"&infec$Week>5]<-"Plasma PM"
-infec$Tissue[infec$Tissue=="pLN"]<-"Perif LN"
+infec$Tissue[infec$Tissue=="pLN"]<-"Periferal LN"
 
 #calcualte the averages
 sivMean<-aggregate(infec[,"mean"],by=list(infec$Cohort, infec$Tissue),mean,na.rm=T )
 colnames(sivMean)<-c("Cohort", "Tissue","Mean")
 
 #Order the factors
-infec$Tissue<-factor(infec$Tissue, levels = c("Plasma","Plasma PM","Perif LN","Thoracic LN","Lung"))
-sivMean$Tissue<-factor(sivMean$Tissue, levels = c("Plasma","Plasma PM","Perif LN","Thoracic LN","Lung"))
+infec$Tissue<-factor(infec$Tissue, levels = c("Plasma","Plasma PM","Periferal LN","Thoracic LN","Lung"))
+sivMean$Tissue<-factor(sivMean$Tissue, levels = c("Plasma","Plasma PM","Periferal LN","Thoracic LN","Lung"))
 infec$Cohort<-factor(infec$Cohort, levels=c("SIV only", "Mtb NR", "Mtb R"))
 sivMean$Cohort<-factor(sivMean$Cohort, levels=c("SIV only", "Mtb NR", "Mtb R"))
 
@@ -259,10 +259,9 @@ ggplot()+
     scale_fill_manual(values=c(1,1,1),guide="none")+
     theme(theme(legend.title = element_blank()))+theme_bw()+
     theme(legend.title = element_blank(), panel.grid.major.x = element_blank())+
-    annotate(geom="text", x=1:5, y=0.49,  label=Test.results$Sig,, color="gray40", size=2.7 )
+    annotate(geom="text", x=1:5, y=0.49,  label=Test.results$Sig, color="gray40", size=2.7 )
 
-#ggsave("Output/Figures/Cohort.pdf", width = 5,height = 3.3)
-ggsave("Output/Figures/Cohort.png", width = 5,height = 3.3, dpi=300)
+ggsave("Output/Figures/Cohort.png", width = 5.5,height = 3.3, dpi=300)
 
 
 #######################################
@@ -313,7 +312,6 @@ ggplot()+
     theme_bw()+
     theme(panel.grid.major.x = element_blank())+
     annotate(geom="text", x=3, y=0.49,  label="a,c", color="gray40", size=3 )
-ggsave("Output/Figures/ByLatentRNR_diversity.pdf", width = 3,height = 3.2)
 ggsave("Output/Figures/ByLatentRNR_diversity.png", width = 3,height = 3,units="in", dpi=300)
 
 
@@ -560,14 +558,14 @@ cor.test(cd8$CD8.percent, cd8$mean, method = "spearman") # p=0.03326, rhp=-0.377
 
 
 
-##
+## Plot all diversity (Figure 4C)
 all_mean<-Sum21[,c("Cohort","Monkey","Tissue2","Week","mean")]
 all_mean<-InsertRow(all_mean,c(0,0,0,0, stks[1,"mean"]),1)
 all_mean[1,1:3]<-c("Stock","Stock","Stock")
 all_mean$label<-paste0(all_mean$Monkey,'_', all_mean$Tissue2,'_', all_mean$Week)
 all_mean$Tissue2[all_mean$Tissue2=="plasma"]<-"Plasma"
-all_mean$Tissue2[all_mean$Tissue2=="pLN"]<-"Perif LN"
-all_mean$Tissue2<-factor(all_mean$Tissue2, levels=c("Stock", "Plasma", "Perif LN","Thoracic LN","Lung"))
+all_mean$Tissue2[all_mean$Tissue2=="pLN"]<-"Periferal LN"
+all_mean$Tissue2<-factor(all_mean$Tissue2, levels=c("Stock", "Plasma", "Periferal LN","Thoracic LN","Lung"))
 
 #order by 'stock,'siv only, NR, N
 all_mean$Cohort<-factor(all_mean$Cohort, levels=c("Stock", "SIV only", "Mtb NR", "Mtb R"))
@@ -621,6 +619,5 @@ ggplot()+
     #annotate("text",x=1, y=0.1, label="stock" , angle=90, hjust=1, size=3, color="gray30")+
     geom_text(aes(x=1, y=-Inf, label="stock") , angle=90, hjust=1.1, size=3, color="gray30")+
     coord_cartesian(clip = "off")
-#ggsave("Output/Figures/diversity_allSamples.pdf", width = 8,height = 3)
 ggsave("Output/Figures/diversity_allSamples.png", width = 8,height = 3,units="in", dpi=300)
 

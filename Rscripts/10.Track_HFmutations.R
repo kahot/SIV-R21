@@ -136,6 +136,71 @@ colnames(summary)[2:7]<-c("Mean_plasma-pLN","Mean_plasma-tLN","Mean_plasma-Lung"
 write.csv(summary, "Output/MF/Difference_MF_betwTissues_mean_p-val.csv")
 
 
+#### Do not use mean and calculate the statistics?
+Diff2<-list()
+for (i in 1:length(Results)){
+    freq<-Results[[i]]
+    freq$tis<-factor(freq$tis, c("plasma_nex", "pLN","Thoracic LN", "Lung"))
+    freq<-freq[order(freq$tis),]
+    monkey<-names(Results)[i]
+    
+    diff<-freq[-1,]
+    for (c in 1:(ncol(freq)-5)){
+        df<-freq[,c(1:5,(c+5))]
+        
+        for (r in 1:(nrow(df)-1)){
+            diff[r, (c+5)]<-df[1,6]-df[(r+1),6]
+        }
+    }
+    
+    
+    diffT<-data.frame(t(diff[,c(6:ncol(diff))]), stringsAsFactors = F)
+    colnames(diffT)<-diff$tis
+    
+    
+    Diff2[[i]]<-diffT
+    names(Diff2)[i]<-monkey
+}
+
+summary2<-data.frame(monkey=monkeys)
+for (i in 1:length(Diff)){
+    diffT<-Diff2[[i]]
+    
+    pln<-c()
+    tln<-c()
+    lung<-c()
+    
+    for (c in 1:ncol(diffT)){
+        if (colnames(diffT)[c]=="pLN"){
+            pln<-c(pln,diffT[,c])}
+        if (colnames(diffT)[c]=="Thoracic LN"){
+            tln<-c(tln,diffT[,c])}
+        if (colnames(diffT)[c]=="Lung"){
+            lung<-c(lung,diffT[,c])}
+    }
+    
+    
+    summary2[i,2:3]<-c(mean(abs(pln), na.rm=T), mean(abs(tln), na.rm=T))
+    if (length(lung[!is.na(lung)])!=0) summary2[i,4]<-mean(abs(lung), na.rm=T)
+    else summary2[i,4]<-NA 
+    
+    r1<-wilcox.test(abs(pln),abs(tln), alternative="two.sided")
+    summary2[i,5]<-r1[[3]]
+
+    if (length(lung[!is.na(lung)])!=0){
+        r2<-wilcox.test(abs(pln),abs(lung), alternative="two.sided")
+        r3<-wilcox.test(abs(tln),abs(lung), alternative="two.sided")
+        summary2[i,6]<-r2[[3]]
+        summary2[i,7]<-r3[[3]]
+    }
+    
+}
+colnames(summary2)[2:7]<-c("Mean_plasma.pLN","Mean_plasma.tLN","Mean_plasma.Lung",
+                          "Pvalue_pLNvs.tLN","Pvalue_pLNvs.lung" , "Pvalue_tLNvs.Lung")
+write.csv(summary2, "Output/MF/Difference_MF_betwTissues_mean_p-val2.csv")
+
+
+###############
 
 
 ### 3116 monkey -are they really significantly different?
@@ -179,7 +244,7 @@ diffM<-melt(diff[,c(1:4,8)], id.vars=c("Cohort","monkey"))
 diffM$monkey<-factor(diffM$monkey, levels=morder)
 cols<-c("#023FA5","#C4A12C", "#8E063B")
 
-clables<-c("Plasma vs. Perif LN", "Plasma vs. Thoracic LN", "Plasma vs. Lung")
+clables<-c("Plasma vs. Periferal LN", "Plasma vs. Thoracic LN", "Plasma vs. Lung")
 colnames(diffM)[3]<-"Comparison"
 
 d2<-diff[,c(1,5:8)]
@@ -211,11 +276,11 @@ ggplot(diffM,aes(x=factor(monkey), y=value*100, color=Comparison))+
     annotate("text", x=9.5, y=9.7, label="Mtb R", hjust=0.5, size=3.5, color='gray20')+
     scale_y_continuous(limits=c(0,9.9),expand = c(0, 0.1))+
     theme_bw()+
-    annotate("text", x=1:11, y=0.2, label=d2$sig, hjust=0.5, size=2.4, color='gray50')+
+    #annotate("text", x=1:11, y=0.2, label=d2$sig, hjust=0.5, size=2.4, color='gray50')+
     
     theme(panel.grid.major.x = element_blank())+
     theme(axis.ticks.x = element_blank())
-ggsave("Output/Figures/Difference.in.highMF.drift.png", width =7.5 , height =3 , dpi=300, units = "in")
+ggsave("Output/Figures/Difference.in.highMF.drift2.png", width =7.5 , height =3 , dpi=300, units = "in")
 
 
 
@@ -224,8 +289,6 @@ aggregate(diff[,c(2:4)], by=list(diff$Cohort), mean, na.rm=T)
 #1 SIV only 0.02058346 0.04151433 0.05201125
 #2   Mtb NR 0.02695502 0.03587039 0.04228236
 #3    Mtb R 0.02261113 0.03437687 0.02148160
-
-hcl_palettes(plot = TRUE)
 
 mean(diff$plas.pLN, na.rm = T) #0.02305849
 mean(diff$plas.tLN, na.rm = T) # 0.03737963

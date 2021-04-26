@@ -90,7 +90,7 @@ aa$Group[aa$Monkey %in% gp1]<-"Sustained AA sub"
 
 aa$Tissue2[aa$Tissue2=="plasma"]<-"Plasma"
 aa$Tissue2[aa$Tissue2=="Plasma"&aa$Week>5]<-"Plasma PM"
-aa$Tissue2[aa$Tissue2=="pLN"]<-"Perif LN"
+aa$Tissue2[aa$Tissue2=="pLN"]<-"Periferal LN"
 aa$Group<-factor(aa$Group, levels=c("Sustained AA sub","No sweep"))
 
 #aa130 in stock?
@@ -103,7 +103,7 @@ s<-data.frame(Monkey=rep("Stock", times=2), Tissue2=rep("Stock", times=2),
               Group=c("Sustained AA sub","No sweep"),
               AA112=f)
 aa<-rbind(aa,s)
-aa$Tissue2<-factor(aa$Tissue2, levels=c("Stock","Plasma","Plasma PM", "Perif LN","Thoracic LN", "Lung"))
+aa$Tissue2<-factor(aa$Tissue2, levels=c("Stock","Plasma","Plasma PM", "Periferal LN","Thoracic LN", "Lung"))
 
 m<-read.csv("Output/monkey_order.csv", stringsAsFactors = F)
 morder<-m$x
