@@ -7,7 +7,7 @@ library(gtable)
 library(grid)
 library(colorspace)
 #colors<-qualitative_hcl(6, palette="Dark3")
-#colors<-qualitative_hcl(6, palette="Pastel1")
+colors<-qualitative_hcl(6, palette="Pastel1")
 MFcolors<-c("#fb8072","#FF9300","#9437FF")
 
 # read the overview files
@@ -107,7 +107,6 @@ freq$ID<-paste(freq$Monkey, 'week',freq$Week)
 freq$ID<-factor(freq$ID, levels=c("3616 week 2", "16314 week 3","3116 week 3","20615 week 3",  "3216 week 3" , "3516 week 3" ))
 freq$Cohort<-factor(freq$Cohort,levels=c("SIV only", "Mtb NR", "Mtb R"))
 
-#
 miss$ID<-paste(miss$Monkey, 'week',miss$Week)
 miss$ID<-factor(miss$ID, levels=c("3616 week 2", "16314 week 3","3116 week 3","20615 week 3",  "3216 week 3" , "3516 week 3" ))
 miss$Cohort<-factor(miss$Cohort,levels=c("SIV only", "Mtb NR", "Mtb R"))
@@ -125,15 +124,13 @@ p1<-ggplot()+
     scale_x_continuous(breaks=c(50,100,150,200,250), limits=c(30,280))+
     scale_y_continuous(breaks=c(0,0.25,0.5,0.75,1),labels=c(0,25,50,75,100), limits=c(0,1))+
     theme_bw()+
-    geom_hline(yintercept = 0.5, color="gray30", size=0.5, linetype=3)+
-    #ggtitle(paste0(monkey," Week ",sample$Week[1]))+
     theme(panel.grid.major.x=element_blank(),panel.grid.minor.x=element_blank())+
     ylab("% Divergence")+
     xlab("Env codon position")+
     theme(legend.title = element_blank())+
     facet_wrap(~ID, scale='free',ncol=2)
 
-p1
+
 gtable_stack <- function(g1, g2){
     g1$grobs <- c(g1$grobs, g2$grobs)
     g1$layout <- transform(g1$layout, z= z-max(z), name="g2")

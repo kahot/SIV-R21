@@ -447,28 +447,215 @@ for (i in 1:length(tests)){
 
 write.csv(divsum, "Output/Diversity/Tests/Wilcox.test.summary.byTest.csv")
 
+### 
+#Attach metadata to Results for exporting
+Re<-Results[Results$Test=="tLN.vs.Lung",]
+sam<-unique(samples2[ , c("Monkey", "Cohort") ] )
+Re<-merge(Re, sam, by="Monkey")
+
+#sample info on the animals that had higher thoracic LN diversity than Lung
+sa<-samples2[samples2$Monkey %in% Re$Monkey, ]
+#sample size
+size<-as.data.frame.matrix(table(sa$Monkey, sa$Tissue2))
+size$Monkey<-rownames(size)
+#attache the sample size
+Re<-merge(Re, size, by="Monkey")
+write.csv(Re, "Output/Diversity/Tests/tLN.Lung.Summary.csv")
+
 
 
 
 ### Granuloma or not ####
-### by tissue with throcic LN and Peripheral LN division
+### by tissue 
 gran<-Sum21[,c("Cohort","Tissue2","Week","mean","Granuloma","SIV.RNA.per.granuloma")]
 gran<-gran[!is.na(gran$Granuloma),] #50 samples
+
+gran$Granuloma[gran$Granuloma=="Y"]<-"Granuloma"
+gran$Granuloma[gran$Granuloma=="N"]<-"Non-granuloma"
+
 
 by.gran<- aggregate(gran["mean"],by=list(gran$Granuloma),mean,na.rm=T )
 
 ggplot()+
-    geom_point(data=gran, aes(x=Granuloma, y=mean*100), color="lightblue",size=2)+
-    geom_point(data=by.gran, aes(x=Group.1, y=mean*100), color="black",size=2)+
+    geom_point(data=gran, aes(x=Granuloma, y=mean*100), color="#00b4d899",size=2, position=position_jitter(width=0.03))+
+    geom_point(data=by.gran, aes(x=Group.1, y=mean*100), color="#023e8a",size=2)+
     xlab('')+ylab('% Diversity')+
     theme(legend.title = element_blank())+
     theme_bw()+
     theme(panel.grid.major.x = element_blank())
-ggsave("Output/Figures/ByGranuloma_diversity.pdf", width = 3,height = 3)
-ggsave("Output/Figures/ByGranuloma_diversity.png", width = 3,height = 3,units="in", dpi=300)
+ggsave("Output/Figures/ByGranuloma_diversity2.png", width = 3,height = 3,units="in", dpi=300)
 
-# Look at Latent R cohort
-granR<-gran[gran$Cohort=="Latent R",]
+ggplot()+
+    geom_boxplot(data=gran, aes(x=Granuloma, y=mean*100), width=0.5,color="#00b4d899")+
+    geom_point(data=by.gran, aes(x=Group.1, y=mean*100), color="#023e8a",size=2)+
+    xlab('')+ylab('% Diversity')+
+    theme(legend.title = element_blank())+
+    theme_bw()+
+    theme(panel.grid.major.x = element_blank())
+ggsave("Output/Figures/ByGranuloma_diversity3.png", width = 3,height = 3,units="in", dpi=300)
+
+
+wilcox.test(gran$mean[gran$Granuloma=="Granuloma"], gran$mean[gran$Granuloma=="Non-granuloma"], alternative="two.sided")
+#W = 332, p-value = 0.6489
+
+#1. Diversity of granuloma by cohort
+by.granC<- aggregate(gran["mean"],by=list(gran$Granuloma, gran$Cohort),mean,na.rm=T )
+
+gran$Cohort<-factor(gran$Cohort, levels=c("SIV only", "Mtb NR", "Mtb R"))
+by.granC$Group.2<-factor(by.granC$Group.2, levels=c("SIV only", "Mtb NR", "Mtb R"))
+
+ggplot()+
+    geom_point(data=gran, aes(x=Granuloma, y=mean*100, color=Cohort),size=2, position=position_dodge(width=0.6))+
+    geom_point(data=by.granC, aes(x=Group.1, y=mean*100, fill=Group.2), color="#023e8a",size=2, position=position_dodge(width=0.6))+
+    xlab('')+ylab('% Diversity')+
+    theme(legend.title = element_blank())+
+    theme_bw()+
+    theme(panel.grid.major.x = element_blank())+
+    scale_color_manual(values = paste0(colors[c(5,3,1)],99))+
+    scale_fill_manual(values=c(rep("#023e8a",times=3)), guide='none')+
+    annotate("segment", x = 0.85, xend = 0.85, y = 0.35, yend = 0.4, colour = "gray60", size=0.3) +
+    annotate("segment", x = 1.15, xend = 1.15, y = 0.31, yend = 0.4, colour = "gray60", size=0.3)+
+    annotate("segment", x = 0.85, xend = 1.15, y = 0.4, yend = 0.4, colour = "gray60", size=0.3)+
+    annotate("text", x = 1, y = 0.41, colour = "gray60", label="*", size=5)
+ggsave("Output/Figures/byGranuloma.byCohort_diversity.png", width = 4.5,height = 3,units="in", dpi=300)
+
+wilcox.test(gran$mean[gran$Granuloma=="Granuloma"&gran$Cohort=="Mtb R"], gran$mean[gran$Granuloma=="Granuloma"&gran$Cohort=="Mtb NR"], alternative="two.sided")
+#W = 10, p-value = 0.0257
+wilcox.test(gran$mean[gran$Granuloma=="Non-granuloma"&gran$Cohort=="Mtb R"], gran$mean[gran$Granuloma=="Non-granuloma"&gran$Cohort=="Mtb NR"], alternative="two.sided")
+#W = 44, p-value = 0.761
+wilcox.test(gran$mean[gran$Granuloma=="Non-granuloma"&gran$Cohort=="Mtb R"], gran$mean[gran$Granuloma=="Non-granuloma"&gran$Cohort=="SIV only"], alternative="two.sided")
+#W = 47, p-value = 0.8534
+wilcox.test(gran$mean[gran$Granuloma=="Non-granuloma"&gran$Cohort=="SIV only"], gran$mean[gran$Granuloma=="Non-granuloma"&gran$Cohort=="Mtb NR"], alternative="two.sided")
+#W = 45, p-value = 0.6965
+
+#Test gran vs. non-gran within each cohort
+wilcox.test(gran$mean[gran$Granuloma=="Granuloma"&gran$Cohort=="Mtb R"], gran$mean[gran$Granuloma=="Non-granuloma"&gran$Cohort=="Mtb R"], alternative="two.sided")
+#W = 87, p-value = 0.9063
+wilcox.test(gran$mean[gran$Granuloma=="Granuloma"&gran$Cohort=="Mtb NR"], gran$mean[gran$Granuloma=="Non-granuloma"&gran$Cohort=="Mtb NR"], alternative="two.sided")
+#W = 24, p-value = 0.2141
+
+
+
+
+#########
+# 2. Diversity in Granuloma by tissue
+by.gran2<- aggregate(gran["mean"],by=list(gran$Granuloma, gran$Tissue2),mean,na.rm=T )
+by.gran2$Group.2<-factor(by.gran2$Group.2, levels=c("pLN","Thoracic LN","Lung"))
+gran$Tissue2<-factor(gran$Tissue2, levels=c("pLN","Thoracic LN","Lung"))
+
+ggplot()+
+    geom_point(data=gran, aes(x=Granuloma, y=mean*100, color=Tissue2),size=2, 
+               position=position_dodge(width=0.5))+
+    geom_point(data=by.gran2, aes(x=Group.1, y=mean*100, color=Group.2, fill=Group.2),
+                                  position=position_dodge(width=0.5), color="#023e8a",size=2)+
+        xlab('')+ylab('% Diversity')+
+    scale_color_manual(values = c("#00BF7D99", "#00B0F699", "#E76BF399"), labels=c("Peripheral LN", "Thoracic LN", "Lung"))+
+    scale_fill_manual(values=c(rep("#023e8a",times=3)), guide='none')+
+    guides(color = guide_legend(title = NULL))+
+    theme_bw()+
+    theme(legend.title = element_blank())+
+    theme(panel.grid.major.x = element_blank())+
+    #annotate("segment", x = 0.85, xend = 0.85, y = 0.35, yend = 0.4, colour = "gray60", size=0.3) +
+    #annotate("segment", x = 1.15, xend = 1.15, y = 0.31, yend = 0.4, colour = "gray60", size=0.3)+
+    #annotate("segment", x = 0.85, xend = 1.15, y = 0.4, yend = 0.4, colour = "gray60", size=0.3)+
+    #annotate("text", x = 1, y = 0.41, colour = "gray60", label="*", size=5)
+
+ggsave("Output/Figures/ByGranuloma.byTissue_diversity.png", width=4.5,height = 3,units="in", dpi=300)
+
+G<-gran[gran$Granuloma=="Granuloma",]
+N<-gran[gran$Granuloma=="Non-granuloma",]
+wilcox.test(G$mean[G$Tissue2=="Lung"],G$mean[G$Tissue2=="Thoracic LN"], alternative="two.sided")
+#W = 30, p-value = 0.0817
+
+wilcox.test(N$mean[N$Tissue2=="Lung"],N$mean[N$Tissue2=="Thoracic LN"], alternative="two.sided")
+#W = 26, p-value = 0.7214
+wilcox.test(N$mean[N$Tissue2=="Lung"],N$mean[N$Tissue2=="pLN"], alternative="two.sided")
+#W = 32, p-value = 0.6612
+wilcox.test(N$mean[N$Tissue2=="pLN"],N$mean[N$Tissue2=="Thoracic LN"], alternative="two.sided")
+#W = 48, p-value = 0.2875
+
+# Non granuloma Latent R samples 
+wilcox.test(N$mean[N$Tissue2=="Lung"&N$Cohort=="Mtb R"],N$mean[N$Tissue2=="Thoracic LN"&N$Cohort=="Mtb R"], alternative="two.sided")
+#W = 5, p-value = 0.3333
+
+# Test thoracic LN granuloma between R and NR
+wilcox.test(G$mean[G$Tissue2=="Thoracic LN"&G$Cohort=="Mtb NR"],G$mean[G$Tissue2=="Thoracic LN"&G$Cohort=="Mtb R"], alternative="two.sided")
+#W = 13, p-value = 0.2
+
+wilcox.test(G$mean[G$Tissue2=="Thoracic LN"&G$Cohort=="Mtb NR"],G$mean[G$Tissue2=="Lung"&G$Cohort=="Mtb R"], alternative="two.sided")
+
+gg<-G[G$Tissue2=="Thoracic LN",]
+
+#####
+#3. Diversity of granuloma by cohory and by tissue (SIV only has non-granuma only. Remove SIV only)
+gran2<-gran[gran$Cohort!="SIV only",]
+
+by.granA<- aggregate(gran2["mean"],by=list(gran2$Granuloma, gran2$Tissue2, gran2$Cohort),mean,na.rm=T )
+
+by.granA$Group.2<-factor(by.granA$Group.2, levels=c("pLN","Thoracic LN","Lung"))
+gran2$Tissue2<-factor(gran2$Tissue2, levels=c("pLN","Thoracic LN","Lung"))
+gran2$Cohort<-factor(gran2$Cohort, levels=c("SIV only", "Mtb NR", "Mtb R"))
+by.granA$Group.3<-factor(by.granA$Group.3, levels=c("SIV only", "Mtb NR", "Mtb R"))
+
+
+ggplot()+
+    geom_point(data=gran2, aes(x=Granuloma, y=mean*100, color=Cohort, shape=Tissue2, group=Cohort),size=2.5, 
+               position=position_dodge(width=0.6))+
+    geom_point(data=by.granA, aes(x=Group.1, y=mean*100, color=Group.3, fill=Group.3, shape=Group.2, group=Group.3),
+               position=position_dodge(width=0.6), color="#023e8a",size=1.5)+
+    xlab('')+ylab('% Diversity')+
+    scale_color_manual(values = paste0(colors[c(3,1)],99))+
+    scale_fill_manual(values=c(rep("#023e8a",times=3)), guide='none')+
+    guides(color = guide_legend(title = NULL))+
+    theme_bw()+
+    theme(legend.title = element_blank())+
+    theme(panel.grid.major.x = element_blank())
+    #annotate("segment", x = 0.85, xend = 0.85, y = 0.35, yend = 0.4, colour = "gray60", size=0.3) +
+    #annotate("segment", x = 1.15, xend = 1.15, y = 0.31, yend = 0.4, colour = "gray60", size=0.3)+
+    #annotate("segment", x = 0.85, xend = 1.15, y = 0.4, yend = 0.4, colour = "gray60", size=0.3)+
+    #annotate("text", x = 1, y = 0.41, colour = "gray60", label="*", size=5)
+
+ggsave("Output/Figures/ByGranuloma.byTissueByCohort_diversity1.png", width = 4.5,height = 3,units="in", dpi=300)
+
+ggplot()+
+    geom_point(data=gran2, aes(x=Granuloma, y=mean*100, color=Cohort, shape=Tissue2),size=2.5, 
+               position=position_dodge(width=0.6))+
+    geom_point(data=by.granA, aes(x=Group.1, y=mean*100, color=Group.3, fill=Group.3, shape=Group.2),
+               position=position_dodge(width=0.6), color="#023e8a",size=1.5)+
+    xlab('')+ylab('% Diversity')+
+    scale_color_manual(values = paste0(colors[c(3,1)],99))+
+    scale_fill_manual(values=c(rep("#023e8a",times=3)), guide='none')+
+    scale_shape_manual(values=c(16,17,15),labels=c("Peripheral LN", "Thoracic LN", "Lung"))+
+    guides(color = guide_legend(title = NULL))+
+    theme_bw()+
+    theme(legend.title = element_blank())+
+    theme(panel.grid.major.x = element_blank())+
+    annotate("segment", x = 0.8, xend = 0.85, y = 0.35, yend = 0.4, colour = "gray60", size=0.3) +
+    annotate("segment", x = 1.2, xend = 1.15, y = 0.31, yend = 0.4, colour = "gray60", size=0.3)+
+    annotate("segment", x = 0.85, xend = 1.15, y = 0.4, yend = 0.4, colour = "gray60", size=0.3)+
+    annotate("text", x = 1, y = 0.41, colour = "gray60", label="*", size=5)
+
+ggsave("Output/Figures/ByGranuloma.byTissueByCohort_diversity2.png", width = 4.8,height = 3,units="in", dpi=300)
+
+
+wilcox.test(N$mean[N$Tissue2=="Thoracic LN"&N$Cohort=="Mtb NR"],N$mean[N$Tissue2=="Lung"&N$Cohort=="Mtb NR"], alternative="two.sided")
+#W = 2, p-value = 0.8
+wilcox.test(N$mean[N$Tissue2=="Thoracic LN"&N$Cohort=="Mtb NR"],N$mean[N$Tissue2=="pLN"&N$Cohort=="Mtb NR"], alternative="two.sided")
+#W = 3, p-value = 0.7
+wilcox.test(N$mean[N$Tissue2=="Lung"&N$Cohort=="Mtb NR"],N$mean[N$Tissue2=="pLN"&N$Cohort=="Mtb NR"], alternative="two.sided")
+#W = 0, p-value = 0.2
+
+wilcox.test(N$mean[N$Tissue2=="Thoracic LN"&N$Cohort=="Mtb R"],N$mean[N$Tissue2=="Lung"&N$Cohort=="Mtb R"], alternative="two.sided")
+#W = 0, p-value = 0.3333
+wilcox.test(N$mean[N$Tissue2=="Thoracic LN"&N$Cohort=="Mtb R"],N$mean[N$Tissue2=="pLN"&N$Cohort=="Mtb R"], alternative="two.sided")
+#W = 15, p-value = 0.2857
+wilcox.test(N$mean[N$Tissue2=="Lung"&N$Cohort=="Mtb R"],N$mean[N$Tissue2=="pLN"&N$Cohort=="Mtb R"], alternative="two.sided")
+#W = 4, p-value = 0.4
+
+
+######
+# Look at 1) Latent R cohort
+granR<-gran[gran$Cohort=="Mtb R",]
 by.granR<- aggregate(granR["mean"],by=list(granR$Granuloma),mean,na.rm=T )
 
 ggplot()+
@@ -478,37 +665,60 @@ ggplot()+
     theme(legend.title = element_blank())+
     theme_bw()+
     theme(panel.grid.major.x = element_blank())
-ggsave("Output/Figures/LatentR_Granuloma_div.pdf", width = 3,height = 3)
+ggsave("Output/Figures/LatentR_Granuloma_div.png", width = 3,height = 3,units="in", dpi=300)
+
+wilcox.test(granR$mean[granR$Granuloma=="Granuloma"],granR$mean[granR$Granuloma=="Non-granuloma"], alternative="two.sided")
+#W = 87, p-value = 0.9063
+
+
+granRm<-melt(granR[,c("Tissue2","Granuloma","mean")])
+granRm$Tissue2<-factor(granRm$Tissue2, levels=c("pLN","Thoracic LN","Lung"))
 
 ggplot()+
-    geom_point(data=granR, aes(x=Granuloma, y=mean*100, color=Tissue2), size=2,
-               position=position_dodge(width = .7))+
-    xlab('')+ylab('% Diversity')+
-    ggtitle("Latent R Cohort: Granuloma or not")+
-    theme_bw()+
-    theme(panel.grid.major.x = element_blank())+
-    theme(legend.title = element_blank())
-ggsave("Output/Figures/LatentR_Granuloma_byTissue_div.pdf", width = 3,height = 3)
-
-
-granNR<-gran[gran$Cohort=="Latent NR",]
-ggplot()+
-    geom_point(data=granNR, aes(x=Granuloma, y=mean*100), color="darkturquoise",size=2)+
+    geom_point(data=granRm, aes(x=Granuloma, y=value*100, color=Tissue2), position=position_dodge(width=0.5),size=2)+
+    #geom_point(data=by.granR, aes(x=Group.1, y=mean*100), color="black",size=2)+
     xlab('')+ylab('% Diversity')+
     theme(legend.title = element_blank())+
     theme_bw()+
-    theme(panel.grid.major.x = element_blank())
-ggsave("Output/Figures/LatentNR_Granuloma_div.pdf", width = 3,height = 3)
+    ggtitle("Mtb R")+
+    theme(panel.grid.major.x = element_blank())+    
+    scale_color_manual(values = c("#00BF7DCC", "#00B0F6CC", "#E76BF3CC"), labels=c("Peripheral LN", "Thoracic LN", "Lung"))+
+    scale_fill_manual(values=c(rep("#023e8a",times=3)), guide='none')+
+    theme(legend.title = element_blank(), plot.title = element_text(size=12))
+ggsave("Output/Figures/LatentR_Granuloma_byTissue_div.png", width = 3,height = 3,units="in", dpi=300)
+
+
+### Latent NR cohort
+granNR<-gran[gran$Cohort=="Mtb NR",]
+ggplot()+
+    geom_point(data=granNR, aes(x=Granuloma, y=mean*100), color="darkturquoise",size=2)+
+    xlab('')+ylab('% Diversity')+
+    ggtitle("Mtb NR")+
+    theme(legend.title = element_blank())+
+    theme_bw()+
+    theme(panel.grid.major.x = element_blank(), plot.title = element_text(size=12))
+ggsave("Output/Figures/LatentNR_Granuloma_div.png", width = 3,height = 3,units="in", dpi=300)
+
+granRm<-melt(granR[,c("Tissue2","Granuloma","mean")])
+granRm$Tissue2<-factor(granRm$Tissue2, levels=c("pLN","Thoracic LN","Lung"))
 
 ggplot()+
     geom_point(data=granNR, aes(x=Granuloma, y=mean*100, color=Tissue2), size=2,
                position=position_dodge(width = .7))+
     xlab('')+ylab('% Diversity')+
-    ggtitle("Latent NR Cohort: Granuloma or not")+
+    ggtitle("Mtb NR")+
+    scale_color_manual(values = c("#00BF7DCC", "#00B0F6CC", "#E76BF3CC"), labels=c("Peripheral LN", "Thoracic LN", "Lung"))+
     theme_bw()+
     theme(panel.grid.major.x = element_blank())+
-    theme(legend.title = element_blank())
-ggsave("Output/Figures/LatentNR_Granuloma_byTissue_div.pdf", width = 3,height = 3)
+    theme(legend.title = element_blank(), plot.title = element_text(size=12))
+
+ggsave("Output/Figures/LatentNR_Granuloma_byTissue_div.png", width = 3,height = 3,units="in", dpi=300)
+
+
+
+
+
+
 
 
 ##### Others
@@ -559,8 +769,8 @@ cor.test(cd8$CD8.percent, cd8$mean, method = "spearman") # p=0.03326, rhp=-0.377
 
 
 ## Plot all diversity (Figure 4C)
-all_mean<-Sum21[,c("Cohort","Monkey","Tissue2","Week","mean")]
-all_mean<-InsertRow(all_mean,c(0,0,0,0, stks[1,"mean"]),1)
+all_mean<-Sum21[,c("Cohort","Monkey","Tissue2","Granuloma","Week","mean")]
+all_mean<-InsertRow(all_mean,c(0,0,0,0,0, stks[1,"mean"]),1)
 all_mean[1,1:3]<-c("Stock","Stock","Stock")
 all_mean$label<-paste0(all_mean$Monkey,'_', all_mean$Tissue2,'_', all_mean$Week)
 all_mean$Tissue2[all_mean$Tissue2=="plasma"]<-"Plasma"
@@ -598,8 +808,16 @@ pos3<-(50-numb$col[8])/2+numb$col[8]+0.5
 
 xlabels<-dat$Week
 xlabels[1]<-""
+
+#samples with granuloma
+all_mean$mean2<-all_mean$mean
+all_mean$mean2[all_mean$Granuloma!="Y"]<-NA
+all_mean$mean2[is.na(all_mean$Granuloma)]<-NA
+
+all_mean<-transform(all_mean,id=as.numeric(factor(label)))
+
 ggplot()+
-    geom_point(data=all_mean, aes(x=label, y=mean*100, color=Tissue2),size=2,
+    geom_point(data=all_mean, aes(x=label, y=mean*100, color=Tissue2),size=2.5,
                position = position_dodge(width = .5))+
     xlab('')+ylab('% Diversity')+
     scale_y_continuous(limits = c(0.1,0.5))+
@@ -618,6 +836,30 @@ ggplot()+
     annotate("text", x=pos3, y=0.5, label="Mtb R", hjust=0.5, size=3.5, color='gray20')+
     #annotate("text",x=1, y=0.1, label="stock" , angle=90, hjust=1, size=3, color="gray30")+
     geom_text(aes(x=1, y=-Inf, label="stock") , angle=90, hjust=1.1, size=3, color="gray30")+
-    coord_cartesian(clip = "off")
-ggsave("Output/Figures/diversity_allSamples.png", width = 8,height = 3,units="in", dpi=300)
+    coord_cartesian(clip = "off")+
+    annotate("point", x=all_mean$id, y=all_mean$mean2*100, shape=21, color="gray10", size=2.7)
+ggsave("Output/Figures/diversity_allSamples3.png", width = 8,height = 3,units="in", dpi=300)
 
+ggplot()+
+    geom_point(data=all_mean, aes(x=label, y=mean*100, color=Tissue2),size=2.5,
+               position = position_dodge(width = .5))+
+    xlab('')+ylab('% Diversity')+
+    scale_y_continuous(limits = c(0.1,0.5))+
+    scale_x_discrete(labels=xlabels)+
+    theme_bw()+
+    theme(legend.title = element_blank())+
+    theme(panel.grid.major.x = element_blank())+
+    geom_vline(xintercept = numb$col[1:11]+0.5,  
+               color = "gray80", size=.4)+
+    annotate("text", x=numb$lab_pos[2:12]+0.5, y=0.1, label= numb$Monkey[2:12], hjust=0.5 , size=3)+
+    annotate("rect", xmin=1.5, xmax=numb$col[5]+0.5,ymax=Inf,ymin=-Inf, fill=colors[5], alpha=0.1 , color=NA)+
+    annotate("rect", xmin=numb$col[5]+0.5, xmax=numb$col[8]+0.5,ymax=Inf,ymin=-Inf, fill=colors[3], alpha=0.1 , color=NA)+
+    annotate("rect", xmin=numb$col[8]+0.5, xmax=50.5,ymax=Inf,ymin=-Inf, fill=colors[1], alpha=0.1 , color=NA)+
+    annotate("text", x=pos1, y=0.5, label="SIV only", hjust=0.5, size=3.5, color='gray20')+
+    annotate("text", x=pos2, y=0.5, label="Mtb NR", hjust=0.5, size=3.5, color='gray20')+
+    annotate("text", x=pos3, y=0.5, label="Mtb R", hjust=0.5, size=3.5, color='gray20')+
+    #annotate("text",x=1, y=0.1, label="stock" , angle=90, hjust=1, size=3, color="gray30")+
+    geom_text(aes(x=1, y=-Inf, label="stock") , angle=90, hjust=1.1, size=3, color="gray30")+
+    coord_cartesian(clip = "off")+
+    annotate("point", x=all_mean$id, y=all_mean$mean2*100, shape=4, color="white", size=2.7)
+ggsave("Output/Figures/diversity_allSamples2.png", width = 8,height = 3,units="in", dpi=300)

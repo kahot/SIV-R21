@@ -155,7 +155,6 @@ pdf("Output/Table1/All_Animals.pdf", width = 12, height=35)
 do.call(grid.arrange, c(Plots, ncol=1))
 dev.off()
 
-Table1_0.006<-Table1
 Table1<-data.frame()
 for (i in 1:length(mutations)){
     df<-table1[,c(1:5,(i+5))]
@@ -206,3 +205,19 @@ for (i in 1:nrow(sum1)){
 sum1$range<-paste0("(",round(sum1$min.freq, digits=4), " - ",round(sum1$max.freq, digits=4),")") 
 sum1$freq_percent<-sum1$mean.freq*100
 write.csv(sum1,"Output/Table1/Table1_Summary.csv")   
+
+
+#how many % of samples had freq. higher than 0.5%?
+df<-table1[table1$Tissue2!="stock",]
+df<-df[df$Tissue2!="control",]
+
+prop<-data.frame(AA.sub=aasubs)
+for (i in 1:length(aasubs)){
+    n<-length(!is.na(df[,aasubs[i]]))
+    k<-sum1$count[sum1$AA.sub==aasubs[i]]
+    prop$percent[i]<-k/n*100
+}
+
+
+
+
