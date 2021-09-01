@@ -205,7 +205,7 @@ for (i in 1:length(fac)){
             xlab('')+ylab('% Average diversity')+
             ggtitle(paste(f))+
             theme(panel.grid.major.x = element_blank(),panel.grid.minor.x = element_blank())
-        ggsave(plot=Plots[[i]],filename=paste0("Output/Betareg/Estimated.effects.",f,".pdf"), width = 5,height = 3)
+        ggsave(plot=Plots[[i]],filename=paste0("Output/GLMM/Estimated.effects.",f,".pdf"), width = 5,height = 3)
         
     }
     if (f=="Week"){
@@ -219,7 +219,7 @@ for (i in 1:length(fac)){
             xlab('')+ylab('% Average diversity')+
             ggtitle(paste(f))+
             theme(panel.grid.major.x = element_blank(),panel.grid.minor.x = element_blank())
-        ggsave(plot=Plots[[i]],filename=paste0("Output/Betareg/Estimated.effects.",f,".pdf"), width = 5,height = 3)
+        ggsave(plot=Plots[[i]],filename=paste0("Output/GLMM/Estimated.effects.",f,".pdf"), width = 5,height = 3)
         
     }   
 }
@@ -245,7 +245,7 @@ legend1<-get_legend(l)
 Plots[[4]]<-legend1
 
 
-png("Output/Betareg/All_estimated_effects.png", width=, height =4.5, units="in",res=300)
+png("Output/GLMM/All_estimated_effects.png", width=, height =4.5, units="in",res=300)
 do.call(grid.arrange, c(Plots, ncol=1))
 dev.off()
 
@@ -360,7 +360,7 @@ coeff.matrix<-function(x, name){
             df$Effect[g]<- (((exp(df[1,1] + df$Estimate[g]) - exp(df[1,1])) /exp(df[1,1])))#add estimate % column
         }
     }
-    write.csv(df, paste0("Output/Betareg/",name,".csv"))
+    write.csv(df, paste0("Output/GLMM/",name,".csv"))
     return(data.frame(df))
     
 }
