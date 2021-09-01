@@ -1,7 +1,7 @@
 # Look for known AA substitutions reported in Ita et al (2018) Table 1.
 
 library(ggplot2)
-library(reshape)
+library(reshape2)
 library(gridExtra)
 
 
@@ -85,7 +85,7 @@ for (i in 1:length(OvDF)){
 }
 
 
-SampleSheet<-read.csv("Data/SampleSheetMac251All.csv", stringsAsFactors =F)
+SampleSheet<-read.csv("Data/SampleSheet_Mac251.csv", stringsAsFactors =F)
 stocks<-SampleSheet[SampleSheet$Monkey=="stock_virus",]
 samples<-SampleSheet[SampleSheet$Monkey!="stock_virus",]
 
@@ -103,7 +103,7 @@ monkeys<-names(monkeyList)
 
 
 #save data frame with monkey info.
-info<-SampleSheet[,c("filename","Monkey","Tissue2","Week", "Cohort")]
+info<-SampleSheet[,c("filename","Monkey","Tissue3","Week", "Cohort")]
 info$Monkey[info$filename=="Run_6_01_Animal_stock_virus"]<-"control"
 info$Tissue2[info$filename=="Run_6_01_Animal_stock_virus"]<-"control"
 info$Monkey [info$filename=="Run_5_01_Animal_stock_virus"]<-"stock"
@@ -157,7 +157,7 @@ dev.off()
 
 Table1<-data.frame()
 for (i in 1:length(mutations)){
-    df<-table1[,c(1:5,(i+5))]
+    df<-table1[,c(1:5,(i+5))]s
     high<- which(df[,6]>0.005)
     if (length(high)==0) next
     else{

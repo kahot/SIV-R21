@@ -1,0 +1,72 @@
+"","Cohort","Monkey","Tissue2","Tissue3","Week","filename","n"
+"1","Mtb R","16314","Plasma","Plasma",3,"Run_4_01_Animal_16314",585
+"2","Mtb R","16314","Plasma_nex","Plasma nex",8,"Run_4_02_Animal_16314",585
+"3","Mtb R","16314","pLN","Peripheral LN",8,"Run_4_03_Animal_16314",585
+"4","Mtb R","16314","tLN","Thoracic LN",8,"Run_4_04_Animal_16314",585
+"5","Mtb R","16314","tLN","Thoracic LN",8,"Run_4_05_Animal_16314",585
+"6","Mtb R","20615","Plasma","Plasma",3,"Run_4_06_Animal_20615",585
+"7","Mtb R","20615","Plasma_nex","Plasma nex",6,"Run_4_07_Animal_20615",585
+"8","Mtb R","20615","pLN","Peripheral LN",6,"Run_4_08_Animal_20615",585
+"9","Mtb R","20615","tLN","Thoracic LN",6,"Run_4_09_Animal_20615",585
+"10","Mtb R","20615","tLN","Thoracic LN",6,"Run_4_10_Animal_20615",585
+"11","Mtb R","3516","Plasma","Plasma",3,"Run_4_11_Animal_3516",585
+"12","Mtb R","3516","Plasma_nex","Plasma nex",8,"Run_4_12_Animal_3516",585
+"13","Mtb R","3516","pLN","Peripheral LN",9,"Run_4_13_Animal_3516",585
+"14","Mtb R","3516","tLN","Thoracic LN",9,"Run_4_14_Animal_3516",585
+"15","Mtb R","3516","tLN","Thoracic LN",9,"Run_4_15_Animal_3516",585
+"16","Mtb NR","30816","Plasma","Plasma",5,"Run_4_16_Animal_30816",585
+"17","Mtb NR","30816","Plasma_nex","Plasma nex",8,"Run_4_17_Animal_30816",585
+"18","Mtb NR","30816","pLN","Peripheral LN",8,"Run_4_18_Animal_30816",585
+"19","Mtb NR","30816","tLN","Thoracic LN",8,"Run_4_19_Animal_30816",585
+"20","Mtb NR","30816","tLN","Thoracic LN",8,"Run_4_20_Animal_30816",585
+"21","Mtb NR","3216","Plasma","Plasma",3,"Run_4_21_Animal_3216",585
+"22","Mtb NR","3216","Plasma_nex","Plasma nex",8,"Run_4_22_Animal_3216",585
+"23","Mtb NR","3216","pLN","Peripheral LN",9,"Run_4_23_Animal_3216",585
+"24","Mtb NR","3216","tLN","Thoracic LN",9,"Run_4_24_Animal_3216",585
+"25","SIV only","3816","Plasma_nex","Plasma nex",8,"Run_5_02_Animal_3816",585
+"26","SIV only","3816","pLN","Peripheral LN",8,"Run_5_03_Animal_3816",585
+"27","SIV only","3816","tLN","Thoracic LN",8,"Run_5_04_Animal_3816",585
+"28","Mtb R","16314","Lung","Lung",8,"Run_5_05_Animal_16314",579
+"29","Mtb R","16314","Lung","Lung",8,"Run_5_06_Animal_16314",585
+"30","Mtb R","16314","Lung","Lung",8,"Run_5_07_Animal_16314",585
+"31","Mtb R","20615","Lung","Lung",6,"Run_5_08_Animal_20615",580
+"32","Mtb R","31316","Lung","Lung",8,"Run_5_09_Animal_31316",580
+"33","Mtb R","31316","Lung","Lung",8,"Run_5_10_Animal_31316",582
+"34","Mtb R","20615","Lung","Lung",6,"Run_5_11_Animal_20615",585
+"35","Mtb R","3516","Lung","Lung",9,"Run_5_12_Animal_3516",563
+"36","Mtb R","3516","Lung","Lung",9,"Run_5_13_Animal_3516",579
+"37","SIV only","3616","Plasma","Plasma",2,"Run_5_14_Animal_3616",582
+"38","SIV only","3616","Plasma_nex","Plasma nex",7,"Run_5_15_Animal_3616",581
+"39","SIV only","3616","pLN","Peripheral LN",7,"Run_5_16_Animal_3616",582
+"40","SIV only","3616","tLN","Thoracic LN",7,"Run_5_17_Animal_3616",574
+"41","SIV only","3316","Plasma_nex","Plasma nex",7,"Run_5_18_Animal_3316",566
+"42","SIV only","3316","pLN","Peripheral LN",7,"Run_5_19_Animal_3316",585
+"43","SIV only","3316","tLN","Thoracic LN",7,"Run_5_20_Animal_3316",585
+"44","SIV only","3816","Lung","Lung",8,"Run_5_21_Animal_3816",583
+"45","SIV only","4016","Plasma_nex","Plasma nex",8,"Run_5_22_Animal_4016",579
+"46","SIV only","4016","tLN","Thoracic LN",8,"Run_5_23_Animal_4016",585
+"47","SIV only","4016","Lung","Lung",8,"Run_5_24_Animal_4016",581
+"48","Mtb R","31316","Plasma","Plasma",5,"Run_6_02_Animal_31316",585
+"49","Mtb R","31316","Plasma_nex","Plasma nex",8,"Run_6_03_Animal_31316",585
+"50","Mtb R","31316","pLN","Peripheral LN",8,"Run_6_04_Animal_31316",585
+"51","Mtb R","31316","tLN","Thoracic LN",8,"Run_6_05_Animal_31316",585
+"52","Mtb R","31316","tLN","Thoracic LN",8,"Run_6_06_Animal_31316",585
+"53","Mtb R","16314","Lung","Lung",8,"Run_6_07_Animal_16314",585
+"54","Mtb R","16314","tLN","Thoracic LN",8,"Run_6_08_Animal_16314",585
+"55","Mtb R","20615","Lung","Lung",6,"Run_6_09_Animal_20615",585
+"56","Mtb R","20615","Lung","Lung",6,"Run_6_10_Animal_20615",585
+"57","Mtb R","20615","Lung","Lung",6,"Run_6_11_Animal_20615",585
+"58","Mtb R","3516","Lung","Lung",9,"Run_6_13_Animal_3516",585
+"59","Mtb R","3516","Lung","Lung",9,"Run_6_14_Animal_3516",585
+"60","Mtb NR","3116","Plasma","Plasma",3,"Run_6_15_Animal_3116",585
+"61","Mtb NR","3116","Plasma_nex","Plasma nex",8,"Run_6_16_Animal_3116",585
+"62","Mtb NR","3116","pLN","Peripheral LN",8,"Run_6_17_Animal_3116",583
+"63","Mtb NR","3116","tLN","Thoracic LN",8,"Run_6_18_Animal_3116",558
+"64","Mtb NR","3116","Lung","Lung",8,"Run_6_19_Animal_3116",585
+"65","Mtb NR","3116","tLN","Thoracic LN",8,"Run_6_20_Animal_3116",582
+"66","Mtb NR","3216","tLN","Thoracic LN",9,"Run_6_21_Animal_3216",585
+"67","Mtb NR","3216","Lung","Lung",9,"Run_6_22_Animal_3216",585
+"68","Mtb NR","30816","tLN","Thoracic LN",8,"Run_6_23_Animal_30816",565
+"69","SIV only","4016","pLN","Peripheral LN",8,"Run_6_24_Animal_4016",585
+"70","","stock_virus","stock","stock",NA,"Run_5_01_Animal_stock_virus",585
+"71","","stock_virus","control","control",NA,"Run_6_01_Animal_stock_virus",579

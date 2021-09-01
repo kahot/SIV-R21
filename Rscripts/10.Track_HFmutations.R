@@ -2,10 +2,10 @@
 #mutation freq differences between tissues comparison
 
 library(ggplot2)
-library(reshape)
+library(reshape2)
 library(gridExtra)
-source("Rscripts/label_scientific.R")
 library(colorspace)
+source("Rscripts/label_scientific.R")
 colors<-qualitative_hcl(6, palette="Dark3")
 
 # read the files saved in Overview_output:
@@ -117,30 +117,54 @@ for (i in 1:length(Results)){
 write.csv(Diff[[4]], "Output/MF/Difference.in.MF.3116.csv")
 
 #Summarize of the frequency differences and RNA copy numbers
-# 1. mean
+
+# 1. mean (each monkey is an independent experiment)
 summary<-data.frame(monkey=monkeys)
+rna_sum<-data.frame(monkey=monkeys)
 for (i in 1:length(Diff)){
     diffT<-Diff[[i]]
-    summary[i,2:4]<-apply(diffT, 2, function(x) mean(abs(x), na.rm=T))
-    r1<-wilcox.test(abs(diffT$`plasma-pLN`),abs(diffT$`plasma-tLN`), alternative="two.sided")
-    summary[i,5]<-r1[[3]]
     lung<-diffT$`plasma-Lung`
-    if (length(lung[!is.na(lung)])!=0){
+    summary[i,2:4]<-apply(diffT, 2, function(x) mean(abs(x), na.rm=T))
+    
+    stats<-data.frame(test=c("pLN.vs.tLN","pLN.vs.Lung","tLN.vs.Lung"))
+    if (length(lung[!is.na(lung)])==0){
+        r1<-wilcox.test(abs(diffT$`plasma-pLN`),abs(diffT$`plasma-tLN`), alternative="two.sided")
+        summary[i,5]<-r1[[3]]
+        summary[i,6]<-NA
+        summary[i,7]<-NA
+    }
+    else{
+        r1<-wilcox.test(abs(diffT$`plasma-pLN`),abs(diffT$`plasma-tLN`), alternative="two.sided")
         r2<-wilcox.test(abs(diffT$`plasma-pLN`),abs(diffT$`plasma-Lung`), alternative="two.sided")
         r3<-wilcox.test(abs(diffT$`plasma-tLN`),abs(diffT$`plasma-Lung`), alternative="two.sided")
-        summary[i,6]<-r2[[3]]
-        summary[i,7]<-r3[[3]]
+        stats$rawP[1]<-r1[[3]]
+        stats$rawP[2]<-r2[[3]]
+        stats$rawP[3]<-r3[[3]]
+        stats<-Pcorrection(stats)
+        summary[i,5]<-stats$Holm[1]
+        summary[i,6]<-stats$Holm[2]
+        summary[i,7]<-stats$Holm[3]
+        
     }
-    rn<-rna[[i]]
-    summary[i, 8:10]<-rn$SIV.RNA.per.tissue[2:4]
     
+    rn<-rna[[i]]
+    rna_sum[i, 2:4]<-rn$SIV.RNA.per.tissue[2:4]
 }
 
-colnames(summary)[2:10]<-c("Mean_plasma-pLN","Mean_plasma-tLN","Mean_plasma-Lung",
-                          "Pvalue_pLNvs.tLN","Pvalue_pLNvs.lung", "Pvalue_tLNvs.Lung",
-                          "RNA.pLN","RNA.tLN","RNA.Lung")
-write.csv(summary, "Output/MF/Difference_MF_betwTissues_mean_p-val.csv")
+colnames(summary)[2:7]<-c("Mean_plasma-pLN","Mean_plasma-tLN","Mean_plasma-Lung",
+                          "Pvalue_pLNvs.tLN","Pvalue_pLNvs.lung", "Pvalue_tLNvs.Lung")
+colnames(rna_sum)[2:4]<-c("RNA.pLN","RNA.tLN","RNA.Lung")
 
+#adjsuted p-values
+write.csv(summary, "Output/MF/Difference_MF_betwTissues_mean_p-val.csv")
+write.csv(rna_sum, "Output/MF/rna.copy.no_summary.csv")
+
+p<-summary[summary$Pvalue_pLNvs.tLN<0.05|summary$Pvalue_pLNvs.lung<0.05|summary$Pvalue_tLNvs.Lung<0.05,]
+p<-p[p$Holm<0.05,]
+
+
+
+#RNA copy numbers
 
 rna.sum1<-summary[,c(1:4)]
 rna.summ1<-melt(rna.sum1)
@@ -164,8 +188,9 @@ cor.test(rna.sum$Difference[rna.sum$tissue=="tLN"], rna.sum$RNA[rna.sum$tissue==
 cor.test(rna.sum$Difference[rna.sum$tissue=="Lung"], rna.sum$RNA[rna.sum$tissue=="Lung"], method="spearman")
 #S = 72, p-value = 0.752
 
-#### Calculate the median
 
+
+#### Calculate the median
 summary2<-data.frame(monkey=monkeys)
 for (i in 1:length(Diff)){
     diffT<-Diff[[i]]
@@ -175,14 +200,14 @@ colnames(summary2)[2:4]<-c("Median_plasma.pLN","Median_plasma.tLN","Median_plasm
 
 summary<-cbind(summary, summary2[,2:4])
 
-write.csv(summary, "Output/MF/Difference_MF_betwTissues_mean_p-val.csv")
+write.csv(summary, "Output/MF/Difference_MF_betwTissues_mMdian.csv")
 
 
 
 
 
 
-#### Insteading of averaging the freq,. differences, use each sample, and calculate the statistics?
+#### Instead of averaging the freq. differences, use each sample, and calculate the statistics?
 #Diff2<-list()
 #for (i in 1:length(Results)){
 #    freq<-Results[[i]]
@@ -287,50 +312,49 @@ diff<-diff[order(diff$monkey),]
 colnames(diff)[2:4]<-c("plas.pLN","plas.tLN","plas.Lung")
 
 #Plot mean
-diffM<-melt(diff[,c(1:4,ncol(diff))], id.vars=c("Cohort","monkey"))
-diffM$monkey<-factor(diffM$monkey, levels=morder)
-cols<-c("#023FA5","#C4A12C", "#8E063B")
-
-clables<-c("Plasma vs. Periferal LN", "Plasma vs. Thoracic LN", "Plasma vs. Lung")
-colnames(diffM)[3]<-"Comparison"
-
-d2<-diff[,c(1,5:8)]
-
-for (i in 1:nrow(d2)){
-    p<-d2[i,2:4]
-    sig<-which(p<0.05)
-    sig[sig==1]<-'a'
-    sig[sig==2]<-'b'
-    sig[sig==3]<-'c'
-    
-    sig<-paste(sig, collapse = ",")
-    d2$sign[i]<-sig
-    
-}
-
-
-ggplot(diffM,aes(x=factor(monkey), y=value*100, color=Comparison))+
-    geom_point(position=position_dodge(width=0.7))+
-    ylab(expression(paste('Ave. absolute difference \n      in frequency (%)')))+
-    xlab('')+geom_vline(xintercept =c(1:10)+0.5,  
-                        color = "gray80", size=.4)+
-    scale_color_manual(values = cols, labels=clables)+
-    
-    annotate("rect", xmin=0.5, xmax=4.5,ymax=Inf,ymin=-Inf, fill=colors[5], alpha=0.1 , color=NA)+
-    annotate("rect", xmin=4.5, xmax=7.5,ymax=Inf,ymin=-Inf, fill=colors[3], alpha=0.1 , color=NA)+
-    annotate("rect", xmin=7.5, xmax=11.5,ymax=Inf,ymin=-Inf, fill=colors[1], alpha=0.1 , color=NA)+
-    annotate("text", x=2.5, y=9.7, label="SIV only", hjust=0.5, size=3.5, color='gray20')+
-    annotate("text", x=6,   y=9.7, label="Mtb NR", hjust=0.5, size=3.5, color='gray20')+
-    annotate("text", x=9.5, y=9.7, label="Mtb R", hjust=0.5, size=3.5, color='gray20')+
-    scale_y_continuous(limits=c(0,9.9),expand = c(0, 0.1))+
-    theme_bw()+
-    #annotate("text", x=1:11, y=0.2, label=d2$sig, hjust=0.5, size=2.4, color='gray50')+
-    theme(axis.title.y = element_text(hjust = 0.5))+
-    theme(panel.grid.major.x = element_blank())+
-    theme(axis.ticks.x = element_blank())+
-    theme(plot.margin=unit(c(0.3,0.2,0,1),"cm"))
-ggsave("Output/Figures/Difference.in.highMF.drift3.png", width =8 , height =3 , dpi=300, units = "in")
-
+#diffM<-melt(diff[,c(1:4,ncol(diff))], id.vars=c("Cohort","monkey"))
+#diffM$monkey<-factor(diffM$monkey, levels=morder)
+#cols<-c("#023FA5","#C4A12C", "#8E063B")
+#
+#clables<-c("Plasma vs. Peripheral LN", "Plasma vs. Thoracic LN", "Plasma vs. Lung")
+#colnames(diffM)[3]<-"Comparison"
+#
+#d2<-diff[,c(1,5:8)]
+#
+#for (i in 1:nrow(d2)){
+#    p<-d2[i,2:4]
+#    sig<-which(p<0.05)
+#    sig[sig==1]<-'a'
+#    sig[sig==2]<-'b'
+#    sig[sig==3]<-'c'
+#    
+#    sig<-paste(sig, collapse = ",")
+#    d2$sign[i]<-sig
+#    
+#}
+#
+#
+#ggplot(diffM,aes(x=factor(monkey), y=value*100, color=Comparison))+
+#    geom_point(position=position_dodge(width=0.7))+
+#    ylab(expression(paste('Ave. absolute difference \n      in frequency (%)')))+
+#    xlab('')+geom_vline(xintercept =c(1:10)+0.5,  
+#                        color = "gray80", size=.4)+
+#    scale_color_manual(values = cols, labels=clables)+
+#    
+#    annotate("rect", xmin=0.5, xmax=4.5,ymax=Inf,ymin=-Inf, fill=colors[5], alpha=0.1 , color=NA)+
+#    annotate("rect", xmin=4.5, xmax=7.5,ymax=Inf,ymin=-Inf, fill=colors[3], alpha=0.1 , color=NA)+
+#    annotate("rect", xmin=7.5, xmax=11.5,ymax=Inf,ymin=-Inf, fill=colors[1], alpha=0.1 , color=NA)+
+#    annotate("text", x=2.5, y=9.7, label="SIV only", hjust=0.5, size=3.5, color='gray20')+
+#    annotate("text", x=6,   y=9.7, label="Mtb NR", hjust=0.5, size=3.5, color='gray20')+
+#    annotate("text", x=9.5, y=9.7, label="Mtb R", hjust=0.5, size=3.5, color='gray20')+
+#    scale_y_continuous(limits=c(0,9.9),expand = c(0, 0.1))+
+#    theme_bw()+
+#    #annotate("text", x=1:11, y=0.2, label=d2$sig, hjust=0.5, size=2.4, color='gray50')+
+#    theme(axis.title.y = element_text(hjust = 0.5))+
+#    theme(panel.grid.major.x = element_blank())+
+#    theme(axis.ticks.x = element_blank())+
+#    theme(plot.margin=unit(c(0.3,0.2,0,1),"cm"))
+#ggsave("Output/Figures/Difference.in.highMF.drift3.png", width =8 , height =3 , dpi=300, units = "in")
 
 
 aggregate(diff[,c(2:4)], by=list(diff$Cohort), mean, na.rm=T)
@@ -358,7 +382,7 @@ diffM2<-melt(diff[,c(1,11:14)], id.vars=c("Cohort","monkey"))
 diffM2$monkey<-factor(diffM2$monkey, levels=morder)
 cols<-c("#023FA5","#C4A12C", "#8E063B")
 
-#clables<-c("Plasma vs. Periferal LN", "Plasma vs. Thoracic LN", "Plasma vs. Lung")
+clables<-c("Plasma vs. Peripheral LN", "Plasma vs. Thoracic LN", "Plasma vs. Lung")
 colnames(diffM2)[3]<-"Comparison"
 
 
@@ -387,4 +411,43 @@ ggsave("Output/Figures/Difference.in.highMF.drift_median.png", width =8 , height
 
 
 
+aggregate(samples[,"SIV.RNA.per.tissue"], by=list(samples$Monkey), mean, na.rm=T)
 
+mean(samples[,"SIV.RNA.per.tissue"], na.rm=T)
+#48,216,291
+library(plotrix)
+std.error(samples[,"SIV.RNA.per.tissue"], na.rm=T)
+#1,661,5470
+sd(samples[,"SIV.RNA.per.tissue"], na.rm=T)
+#117,489,113
+
+
+
+Mean<-aggregate(samples[,"SIV.RNA.per.tissue"], by=list(samples$Cohort), mean, na.rm=T)
+#  Group.1        x
+#1   Mtb NR 78448773
+#2    Mtb R 18165317
+#3 SIV only 96080038
+
+se<-aggregate(samples[,"SIV.RNA.per.tissue"], by=list(samples$Cohort), std.error, na.rm=T)
+Mean$SE<-sd$x
+
+colnames(Mean)<-c("Cohort","Mean","SE") 
+
+ggplot(data=Mean, aes(x=Cohort, y=Mean))+
+    geom_point(data=samples, aes(x=Cohort,y=SIV.RNA.per.tissue),color="lightblue")+
+    geom_point()+
+    geom_errorbar(aes(ymin=Mean-SE, ymax=Mean+SE), width=.2, size=.2)
+
+    scale_y_continuous(trans = 'log10', labels=label_scientific)
+
+
+
+
+aggregate(samples[,"SIV.RNA.per.tissue"], by=list(samples$Cohort, samples$Tissue2), mean, na.rm=T)
+
+aggregate(samples[,"SIV.RNA.per.tissue"], by=list(samples$Cohort, samples$Tissue2, samples$Granuloma), mean, na.rm=T)
+
+
+
+     

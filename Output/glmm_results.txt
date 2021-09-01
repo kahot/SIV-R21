@@ -1,0 +1,254 @@
+
+> siv$Count<-round(siv$mean*1000000)
+> po<-glmmTMB(Count~ Week+ Tissue2+Cohort+(1|Monkey), data=siv, family=poisson)
+> summary(po)
+ Family: poisson  ( log )
+Formula:          Count ~ Week + Tissue2 + Cohort + (1 | Monkey)
+Data: siv
+
+     AIC      BIC   logLik deviance df.resid 
+  2660.6   2680.7  -1321.3   2642.6       60 
+
+Random effects:
+
+Conditional model:
+ Groups Name        Variance Std.Dev.
+ Monkey (Intercept) 0.01446  0.1203  
+Number of obs: 69, groups:  Monkey, 11
+
+Conditional model:
+                    Estimate Std. Error z value Pr(>|z|)    
+(Intercept)        7.7851943  0.0638606  121.91  < 2e-16 ***
+Week              -0.0466761  0.0062573   -7.46 8.69e-14 ***
+Tissue2Plasma_nex  0.2402176  0.0283994    8.46  < 2e-16 ***
+Tissue2pLN         0.2009899  0.0294872    6.82 9.35e-12 ***
+Tissue2tLN         0.3030395  0.0290074   10.45  < 2e-16 ***
+Tissue2Lung        0.2426420  0.0293884    8.26  < 2e-16 ***
+CohortMtb NR       0.1999437  0.0922611    2.17   0.0302 *  
+CohortMtb R       -0.0005352  0.0853323   -0.01   0.9950    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+
+> nb1<-glmmTMB(Count~ Week+ Tissue2+Cohort+(1|Monkey), data=siv, family=nbinom1)
+> summary(nb1)
+ Family: nbinom1  ( log )
+Formula:          Count ~ Week + Tissue2 + Cohort + (1 | Monkey)
+Data: siv
+
+     AIC      BIC   logLik deviance df.resid 
+  1008.6   1030.9   -494.3    988.6       59 
+
+Random effects:
+
+Conditional model:
+ Groups Name        Variance Std.Dev.
+ Monkey (Intercept) 0.01206  0.1098  
+Number of obs: 69, groups:  Monkey, 11
+
+Dispersion parameter for nbinom1 family (): 31.6 
+
+Conditional model:
+                    Estimate Std. Error z value Pr(>|z|)    
+(Intercept)        7.787e+00  1.190e-01   65.43   <2e-16 ***
+Week              -4.529e-02  2.964e-02   -1.53   0.1265    
+Tissue2Plasma_nex  2.335e-01  1.393e-01    1.68   0.0938 .  
+Tissue2pLN         1.946e-01  1.441e-01    1.35   0.1770    
+Tissue2tLN         2.906e-01  1.411e-01    2.06   0.0395 *  
+Tissue2Lung        2.315e-01  1.436e-01    1.61   0.1069    
+CohortMtb NR       1.960e-01  9.643e-02    2.03   0.0421 *  
+CohortMtb R        5.669e-05  8.753e-02    0.00   0.9995    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+
+
+> nb2<-glmmTMB(Count~ Week+ Tissue2+Cohort+(1|Monkey), data=siv, family=nbinom2)
+> summary(nb2)
+ Family: nbinom2  ( log )
+Formula:          Count ~ Week + Tissue2 + Cohort + (1 | Monkey)
+Data: siv
+
+     AIC      BIC   logLik deviance df.resid 
+  1001.7   1024.0   -490.8    981.7       59 
+
+Random effects:
+
+Conditional model:
+ Groups Name        Variance Std.Dev.
+ Monkey (Intercept) 0.01223  0.1106  
+Number of obs: 69, groups:  Monkey, 11
+
+Dispersion parameter for nbinom2 family (): 80.5 
+
+Conditional model:
+                    Estimate Std. Error z value Pr(>|z|)    
+(Intercept)        7.7818681  0.1151585   67.58   <2e-16 ***
+Week              -0.0455278  0.0287349   -1.58   0.1131    
+Tissue2Plasma_nex  0.2313816  0.1343950    1.72   0.0851 .  
+Tissue2pLN         0.2025290  0.1395230    1.45   0.1466    
+Tissue2tLN         0.3027156  0.1373154    2.20   0.0275 *  
+Tissue2Lung        0.2353554  0.1381179    1.70   0.0884 .  
+CohortMtb NR       0.1983838  0.0960890    2.06   0.0390 *  
+CohortMtb R       -0.0002625  0.0867403    0.00   0.9976    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+>
+
+> beta<-glmmTMB(mean~ Week+ Tissue2+Cohort+(1|Monkey), data=Sum, family=beta_family())
+> summary(beta)
+ Family: beta  ( logit )
+Formula:          mean ~ Week + Tissue2 + Cohort + (1 | Monkey)
+Data: Sum
+
+     AIC      BIC   logLik deviance df.resid 
+  -898.0   -875.6    459.0   -918.0       59 
+
+Random effects:
+
+Conditional model:
+ Groups Name        Variance Std.Dev.
+ Monkey (Intercept) 0.01211  0.11    
+Number of obs: 69, groups:  Monkey, 11
+
+Dispersion parameter for beta family (): 3.06e+04 
+
+Conditional model:
+                    Estimate Std. Error z value Pr(>|z|)    
+(Intercept)       -6.026e+00  1.192e-01  -50.54   <2e-16 ***
+Week              -4.541e-02  2.970e-02   -1.53   0.1263    
+Tissue2Plasma_nex  2.340e-01  1.397e-01    1.68   0.0938 .  
+Tissue2pLN         1.950e-01  1.444e-01    1.35   0.1770    
+Tissue2tLN         2.911e-01  1.415e-01    2.06   0.0396 *  
+Tissue2Lung        2.319e-01  1.440e-01    1.61   0.1072    
+CohortMtb NR       1.963e-01  9.661e-02    2.03   0.0422 *  
+CohortMtb R        9.237e-05  8.770e-02    0.00   0.9992    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+########
+## Model Selection ###
+
+nb2.dredge<-MuMIn::dredge(nb2)
+Fixed terms are "cond((Int))" and "disp((Int))"
+> print(nb2.dredge)
+Global model call: glmmTMB(formula = Count ~ Week + Tissue2 + Cohort + (1 | Monkey), 
+    data = siv, family = nbinom2, ziformula = ~0, dispformula = ~1)
+---
+Model selection table 
+  cnd((Int)) dsp((Int)) cnd(Chr) cnd(Ts2)  cnd(Wek) df   logLik   AICc delta weight
+1      7.728          +                              3 -497.448 1001.3  0.00  0.332
+2      7.685          +        +                     5 -495.645 1002.2  0.98  0.204
+5      7.681          +                    0.006356  4 -497.245 1003.1  1.85  0.132
+3      7.687          +                 +            7 -493.800 1003.4  2.17  0.112
+6      7.645          +        +           0.005538  6 -495.491 1004.3  3.07  0.072
+7      7.803          +                 + -0.034630  8 -493.141 1004.7  3.42  0.060
+4      7.644          +        +        +            9 -492.062 1005.2  3.91  0.047
+8      7.782          +        +        + -0.045530 10 -490.836 1005.5  4.20  0.041
+Models ranked by AICc(x) 
+Random terms (all models): 
+‘cond(1 | Monkey)’
+
+> beta.dredge<-MuMIn::dredge(beta)
+Fixed terms are "cond((Int))" and "disp((Int))"
+> print(beta.dredge)
+Global model call: glmmTMB(formula = mean ~ Week + Tissue2 + Cohort + (1 | Monkey), 
+    data = Sum, family = beta_family(), ziformula = ~0, dispformula = ~1)
+---
+Model selection table 
+  cnd((Int)) dsp((Int)) cnd(Chr) cnd(Ts2)  cnd(Wek) df  logLik   AICc delta weight
+1     -6.085          +                              3 453.130 -899.9  0.00  0.390
+2     -6.129          +        +                     5 454.896 -898.8  1.05  0.230
+5     -6.127          +                    0.005654  4 453.277 -897.9  1.96  0.146
+6     -6.162          +        +           0.004563  6 454.993 -896.6  3.26  0.076
+3     -6.124          +                 +            7 456.164 -896.5  3.40  0.071
+7     -6.010          +                 + -0.033450  8 456.749 -895.1  4.79  0.035
+4     -6.167          +        +        +            9 457.838 -894.6  5.27  0.028
+8     -6.026          +        +        + -0.045410 10 458.987 -894.2  5.71  0.022
+Models ranked by AICc(x) 
+Random terms (all models): 
+‘cond(1 | Monkey)’
+
+
+#### no random variable
+
+> nb1.2<-glmmTMB(Count~ Week+ Tissue2+Cohort, data=siv, family=nbinom1)
+> summary(nb1.2)
+ Family: nbinom1  ( log )
+Formula:          Count ~ Week + Tissue2 + Cohort
+Data: siv
+
+     AIC      BIC   logLik deviance df.resid 
+  1029.9   1050.0   -506.0   1011.9       60 
+
+
+Dispersion parameter for nbinom1 family (): 60.1 
+
+Conditional model:
+                   Estimate Std. Error z value Pr(>|z|)    
+(Intercept)        7.821584   0.098367   79.51  < 2e-16 ***
+Week              -0.055828   0.022955   -2.43  0.01501 *  
+Tissue2Plasma_nex  0.280698   0.128148    2.19  0.02849 *  
+Tissue2pLN         0.253320   0.131463    1.93  0.05399 .  
+Tissue2tLN         0.355615   0.125987    2.82  0.00476 ** 
+Tissue2Lung        0.279604   0.128065    2.18  0.02901 *  
+CohortMtb NR       0.193873   0.059492    3.26  0.00112 ** 
+CohortMtb R        0.004612   0.053795    0.09  0.93167    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+
+> nb2.2<-glmmTMB(Count~ Week+ Tissue2+Cohort, data=siv, family=nbinom2)
+> summary(nb2.2)
+ Family: nbinom2  ( log )
+Formula:          Count ~ Week + Tissue2 + Cohort
+Data: siv
+
+     AIC      BIC   logLik deviance df.resid 
+  1023.3   1043.4   -502.6   1005.3       60 
+
+
+Dispersion parameter for nbinom2 family (): 41.8 
+
+Conditional model:
+                    Estimate Std. Error z value Pr(>|z|)    
+(Intercept)        7.8151182  0.0952021   82.09  < 2e-16 ***
+Week              -0.0564404  0.0211764   -2.67 0.007693 ** 
+Tissue2Plasma_nex  0.2847575  0.1164877    2.44 0.014504 *  
+Tissue2pLN         0.2490988  0.1198192    2.08 0.037621 *  
+Tissue2tLN         0.3660671  0.1154933    3.17 0.001527 ** 
+Tissue2Lung        0.2856728  0.1143355    2.50 0.012470 *  
+CohortMtb NR       0.2207316  0.0574080    3.84 0.000121 ***
+CohortMtb R        0.0007041  0.0503471    0.01 0.988842    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+
+> beta2<-glmmTMB(mean~ Week+ Tissue2+Cohort, data=Sum, family=beta_family())
+> summary(beta2)
+ Family: beta  ( logit )
+Formula:          mean ~ Week + Tissue2 + Cohort
+Data: Sum
+
+     AIC      BIC   logLik deviance df.resid 
+  -876.7   -856.5    447.3   -894.7       60 
+
+
+Dispersion parameter for beta family (): 1.63e+04 
+
+Conditional model:
+                   Estimate Std. Error z value Pr(>|z|)    
+(Intercept)       -5.991198   0.098540  -60.80  < 2e-16 ***
+Week              -0.055956   0.023003   -2.43  0.01499 *  
+Tissue2Plasma_nex  0.281206   0.128416    2.19  0.02854 *  
+Tissue2pLN         0.253856   0.131733    1.93  0.05397 .  
+Tissue2tLN         0.356205   0.126247    2.82  0.00478 ** 
+Tissue2Lung        0.280082   0.128347    2.18  0.02909 *  
+CohortMtb NR       0.193966   0.059605    3.25  0.00114 ** 
+CohortMtb R        0.004648   0.053893    0.09  0.93128    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+
+
+
