@@ -17,9 +17,10 @@
 	• After creating a consensus sequence for each file using Geneious (or another tool of your choice), run the files in Data/BashScripts2/ 
 	
 ```bash
-	for f in Data/BashScripts1/*.sh; do
-      bash "$f" -H   || break 
-    done
+#Run all bash scripts in a directory
+for f in Data/BashScripts1/*.sh; do
+	bash "$f" -H   || break 
+done
 ```
     • Need bam and bai (index) files for the next step  
     
