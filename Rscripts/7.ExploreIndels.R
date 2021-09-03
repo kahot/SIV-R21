@@ -3,7 +3,6 @@
 library(ggplot2)
 library(reshape2)
 library(gridExtra)
-
 library(colorspace)
 cols<-qualitative_hcl(6, palette="Dark3")
 
@@ -20,11 +19,9 @@ for (i in 1:length(OverviewFiles)){
 }
 
 
-SampleSheet<-read.csv("Data/SampleSheetMac251All.csv", stringsAsFactors =F)
+SampleSheet<-read.csv("Data/SampleSheet_Mac251.csv", stringsAsFactors =F)
 stocks<-SampleSheet[SampleSheet$Monkey=="stock_virus",]
 samples<-SampleSheet[SampleSheet$Monkey!="stock_virus",]
-which(SampleSheet$Monkey=="stock_virus") #25,49
-SampleSheet$filename[SampleSheet$Monkey=="stock_virus"]
 
 list.animal<-split(samples, samples$Monkey)
 monkeyList<-list()

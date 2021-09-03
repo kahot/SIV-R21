@@ -1,12 +1,10 @@
-#Read bam files and covert them to "frequency tables" and save as csv files
-
+# Covert bam files to "frequency tables" and save as csv files
 library(Rsamtools)
 library(stringr)
-
 source("Rscripts/pileupFreq.R")
 
 #dir.create("Output/CSV/")
-#number of sampels to process
+#list the files to be processed
 bamfiles<-list.files("Output/bam2/",pattern="bam$")
 
 for (i in 1:length(bamfiles)){
@@ -41,7 +39,7 @@ csns<-data.frame(t(con), stringsAsFactors = F)
 csns$merged.pos<-1:nrow(csns)
 colnames(csns)[3:73]<-gsub('_Consensus','',colnames(csns[3:73]))
 
-#Name 251 Consensus as ref
+# Rename the references 
 colnames(csns)[1]<-"ref251"
 colnames(csns)[2]<-"ref239"
 
@@ -49,7 +47,7 @@ colnames(csns)[2]<-"ref239"
 csns<-csns[csns$merged.pos<=834,]
 
 
-for (i in 1:73){
+for (i in 1:(ncol(csns)-1)){
     nt<-csns[,i]
     k=1
     pos<-c()
@@ -66,12 +64,12 @@ for (i in 1:73){
     csns[paste0(colnames(csns)[i],".pos")]<-pos
 }
 
-
+#Take the position information only
 cs<-csns[,74:ncol(csns)]
 write.csv(cs,"merged.pos.csv")
 
 ## codon positions
-#Check insertions are with 3x nucetoides
+#Check insertions are nucleotide x3 length and add codon positions
 for (i in 1:73){
     seq<-csns[,i]
     print(colnames(csns)[i])

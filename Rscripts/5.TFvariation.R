@@ -189,8 +189,6 @@ ggsave("Output/Figures/Legend2.png", width = 5.5, height=5, units="in", dpi=300)
 ### Initial Transmission bottleneck 
 #using 6 samples at week 2/3
 
-fq<-c()
-reads<-c()
 tf.div<-data.frame(file.name=early$filename)
 for (i in 1:length(TF)){
     id<-early$filename[i]
@@ -201,8 +199,7 @@ for (i in 1:length(TF)){
     df<-df[df$AA251pos<276,]
     df<-df[df$ref251.pos<395|df$ref251.pos>540,]
     df<-df[!is.na(df$freq.mutations),]
-    fq<-c(fq, df$freq.mutations)
-    reads<-c(reads, df$TotalReads)
+    
     tf.div$Mean[i]<-mean(df$freq.mutations, na.rm=T)
     tf.div$SE[i]<-sqrt(tf.div$Mean[i]*(1-tf.div$Mean[i])/sum(df$TotalReads, na.rm=T))
     tf.div$read.mean[i]<-mean(df$TotalReads, na.rm=T)
@@ -216,109 +213,4 @@ SE<-mean(tf.div$SE)
 SE*100
 #0.0005083513
 
-
-
-m<-mean(fq,na.rm = T)    
-#0.002138351
-t<-sum(reads)
-se<-sqrt(m*(1-m)/t)
-se*100
-#0.0001900526
-
-#Mean of 6 samples
-M<-mean(tf.div$Mean)
-R<-mean(tf.div$read.mean)
-SE<-sqrt(M*(1-M)/5)
-SE*100
-
-
-
-
-
-#compare with the stock
-stk<-OvDF[[SampleSheet$filename[SampleSheet$Tissue=="stock_virus"]]]
-stk<-stk[stk$TotalReads>100,]
-stk<-stk[stk$AA251pos<276,]
-stk<-stk[stk$ref251.pos<395|stk$ref251.pos>540,]
-stk<-stk[!is.na(df$freq.mutations),]
-r<-wilcox.test(stk$freq.mutations,fq, alternative = "two.sided")
-#W = 796635, p-value < 2.2e-16
-r[3]
-#$p.value = 4.256172e-18
-
-## Ita's trasmittsion bottleneck
-ItaFiles<-list.files("Output/Overview/Ita/",pattern="overview.csv")
-ItaOv<-list()
-for (i in 1:length(ItaFiles)){ 
-    overviews<-read.csv(paste0("Output/Overview/Ita/",ItaFiles[i]),stringsAsFactors=FALSE, row.names = 1)
-    ItaOv[[i]]<-overviews
-    names(ItaOv)[i]<-gsub("_overview.csv",'',ItaFiles[i])
-}
-#sample info
-SampleIta<-read.csv("Data/Ita.SampleInfo.csv", stringsAsFactors =F)
-
-# 1st sampling timepoint
-initi<-c("mm10.2","mm156.3","mm198.2","mm198.2")
-TFita<-ItaOv[initi]
-fq2<-c()
-reads2<-c()
-for (i in 1:length(TFita)){
-    id<-initi[i]
-    df<-TFita[[id]]
-    df[which(df$TotalReads<100),17:26]<-NA
-    df<-df[df$AA251pos<276,]
-    df<-df[df$ref251.pos<395|df$ref251.pos>540,]
-    df<-df[!is.na(df$freq.mutations),]
-    fq2<-c(fq2, df$freq.mutations)
-    
-    reads2<-c(reads2, df$TotalReads)
-}
-
-m2<-mean(fq2,na.rm = T)    
-m2 #0.01623242
-
-t2<-sum(reads2)
-se2<-sqrt(m2*(1-m2)/t2)
-se2*100
-#0.002728932
-
-stkIta<-ItaOv[["mmStock"]]
-stkIta<-stkIta[stkIta$TotalReads>100,]
-stkIta<-stkIta[stkIta$AA251pos<276,]
-stkIta<-stkIta[stkIta$ref251.pos<395|stkIta$ref251.pos>540,]
-
-mean(stkIta$freq.mutations, na.rm = T)
-#0.01543699
-r<-wilcox.test(stkIta$freq.mutations,fq2, alternative =  "t")
-#W = 653320, p-value = 0.004831
-
-## Test without removing the center region for Ita's
-fq2<-c()
-reads2<-c()
-for (i in 1:length(TFita)){
-    id<-initi[i]
-    df<-TFita[[id]]
-    df[which(df$TotalReads<100),17:26]<-NA
-    df<-df[df$AA251pos<276,]
-    df<-df[!is.na(df$freq.mutations),]
-    fq2<-c(fq2, df$freq.mutations)
-    reads2<-c(reads2, df$TotalReads)
-}
-
-m2<-mean(fq2,na.rm = T)    
-m2 #0.01963248
-
-t2<-sum(reads2)
-se2<-sqrt(m2*(1-m2)/t2)
-se2*100
-#0.002732195
-
-stkIta<-ItaOv[["mmStock"]]
-stkIta<-stkIta[stkIta$TotalReads>100,]
-stkIta<-stkIta[stkIta$AA251pos<276,]
-
-mean(stkIta$freq.mutations, na.rm = T)
-#0.01972182
-r<-wilcox.test(stkIta$freq.mutations,fq2, alternative =  "t")
-#p-value = 0.0005299
 

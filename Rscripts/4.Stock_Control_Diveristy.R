@@ -1,8 +1,8 @@
-#Look at stock diversity and the control file
-
+# Assess the diversity of the stock and the control
 library(ggplot2)
-library(reshape)
+library(reshape2)
 library(gridExtra)
+library(cowplot)
 
 MFcolors<-c("#fb8072","#FF9300","#9437FF")
 
@@ -13,7 +13,7 @@ OvDF<-list()
 for (i in 1:length(OverviewFiles)){ 
     overviews<-read.csv(paste0("Output/Overview/",OverviewFiles[i]),stringsAsFactors=FALSE, row.names = 1)
     OvDF[[i]]<-overviews
-    names(OvDF)[i]<-gsub("_overview.csv",'',OverviewFiles[i])}
+    names(OvDF)[i]<-gsub("_overview.csv",'',OverviewFiles[i])
 }
 #sample info
 SampleSheet<-read.csv("Data/SampleSheetMac251All.csv", stringsAsFactors =F)
@@ -52,7 +52,6 @@ ggplot(ctrl, aes(x=AA239pos, y=freq.mutations*100))+
     theme_bw()+
     theme(panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank())
     #ggtitle(paste0("SIV251 control "))
-ggsave("Output/Diversity/Control.pdf",width = 4,height = 2.7)
 ggsave("Output/Diversity/Control.png",width = 4,height = 2.7, unit="in",dpi=300 )
 
 
@@ -80,7 +79,6 @@ stockMf<-OvDF[[stock$filename]]
 #% diversity of Stock
 stockMf[which(stockMf$TotalReads<100),17:26]<-NA
 
-#enter zero for missing middle regions
 #missing region aa251.pos 94, 397 to 540, 83, >826
 stockMf[stockMf$ref251.pos>=395&stockMf$ref251.pos<=540,c(17:26)]<-NA
 
@@ -88,7 +86,6 @@ stockMf[stockMf$ref251.pos>=395&stockMf$ref251.pos<=540,c(17:26)]<-NA
 ggplot(stockMf, aes(x=AA239pos, y=freq.mutations))+
     geom_point(position=position_dodge(width=0.8), size=0.5)+
     theme_bw()+ylim(0,0.5)+
-    
     ylab("% Diversity from consensus")+
     xlab("Env codon position")+
     ggtitle(paste0("SIV251 stock diversity "))+
@@ -99,7 +96,7 @@ mean(stockMf$freq.mutations, na.rm=T)
 #0.002500958 
 skpos<-stockMf[!is.na(stockMf$freq.mutations)&stockMf$freq.mutations>0.005,]
 
-## Sergio's stock virus:
+## Ita et al.(Sergio)'s stock virus:
 stockMfS<-read.csv("Output/Overview/Ita/mmStock_overview.csv", stringsAsFactors = F, row.names = 1)
 stockMfS[which(stockMfS$TotalReads<100),18:27]<-NA
 #exclude the missing sites in R21 stock (pos397 to 540) & pos395
@@ -190,7 +187,7 @@ ggplot(data=mut2, aes(x=AA239pos, y=value, color=Type, fill=Type))+
 ggsave(paste0("Output/Figures/R21_stock_diversity_barplot.png"),width =4, height = 3, units = "in", dpi=300)
 
 
-#Create a table and plot the stock diversity (point plot) from both studties 
+#Create a table and plot the stock diversity (point plot) from both studies 
 summary1<-data.frame(study=c("SIV-Mtb","Ita"))
 cutoff<-0.005
 
@@ -289,14 +286,14 @@ for (i in 1:2){
     
 }
 
-library(cowplot)
+
 png("Output/Figures/Stock_diversity_bothStudies.png", unit="in",width = 8, height=3, res=300)
 plot_grid(p1, p2, align = "v", ncol = 2, rel_widths = c(.75,1))
 dev.off()
 
 write.csv(summary1,"Output/Diversity/Stock_virus_diversity_summary_R21_Ita.csv")
 
-#R21 numbers of sitew with diversity >0.5% 
+#R21 numbers of site with diversity >0.5% 
 mut1<-read.csv("Output/Diversity/Div.mf.summary_SIV-Mtb.csv", row.names = 1,stringsAsFactors = F)
 mut1<-mut1[mut1$freq>0.005,]
 table(mut1$Type)

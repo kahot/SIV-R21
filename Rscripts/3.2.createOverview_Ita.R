@@ -1,4 +1,4 @@
-#Script to analyse the frequency data and associate with features for Ita et al(2018) data
+# Add mutation types and associate with features to frequency data to Ita et al(2018) data
 library(dplyr)
 source("Rscripts/baseRscript.R")
 
@@ -252,31 +252,30 @@ for (i in 1:length(SIVFiles_SeqData)){
 write.csv(ReadsSummary,"Output/ReadsSummary_Ita.csv")      
 
 
+
+library(ggplot2)
+#source("Rscripts/label_scientific.R")
+
 ###
 ReadsSummary<-read.csv("Output/ReadsSummary_Ita.csv", row.names = 1)
 ggplot(ReadsSummary, aes(x=SampleID, y=AveDepth))+
     geom_point(size=0.8)+
-    theme(axis.text.x=element_text(angle=90))+ylab("Average read depth")+
-    scale_y_continuous(labels = label_scientific())
+    theme(axis.text.x=element_text(angle=90))+ylab("Average read depth")
 ggsave("Output/average.readdepth_Ita.pdf", width = 8, height = 6)    
 
 #plot together with R21 study data
-
 ReadsSummary2<-read.csv("Output/ReadsSummary.csv", row.names = 1)
 
 reads<-rbind(ReadsSummary2,ReadsSummary)
 ggplot(reads, aes(x=SampleID, y=AveDepth))+
     geom_point(size=0.8)+
-    theme(axis.text.x=element_text(angle=90))+
-    scale_y_continuous(labels = label_scientific())
+    theme(axis.text.x=element_text(angle=90))
 ggsave("Output/average.readdepth_R21andIta.pdf", width = 8, height = 6)    
 
 
 #Create the average mf data
 
 OverviewFiles<-list.files("Output/Overview/Ita/",pattern="overview.csv")
-#remove the stock and control
-#OverviewFiles<-OverviewFiles[-c(49,25)]
 
 MF<-data.frame(sample=1:length(OverviewFiles))
 for (i in 1:length(OverviewFiles)){ 
@@ -290,16 +289,3 @@ for (i in 1:length(OverviewFiles)){
 Summary<-merge(MF, ReadsSummary[,c("SampleID","AveDepth")], by="SampleID")
 write.csv(Summary,"Output/AveMF_Deapth_Ita.summary.csv")
 
-ggplot(Summary,aes(x=ave.mf, y=AveDepth))+
-    geom_point()+
-    xlab("Average minor variant freq")+ylab("Average read depth")
-ggsave("Output/depth.vs.mf_Ita.pdf", width = 4, height = 4)
-
-cor.test(Summary$ave.mf, Summary$AveDepth, method="spearman")
-#p-value = 0.005153
-#      rho 
-#-0.6245614  
-
-
-mean(ReadsSummary$AveDepth)
-mean(ReadsSummary2$AveDepth)

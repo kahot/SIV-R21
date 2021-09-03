@@ -37,7 +37,6 @@ p1<-ggplot()+
     theme(legend.title = element_blank())+
     theme_bw()+
     theme(panel.grid.major.x = element_blank())
-#ggsave("Output/Figures/ByGranuloma_diversity2.png", width = 3,height = 3,units="in", dpi=300)
 
 wilcox.test(gran$mean[gran$Granuloma=="Granuloma"], gran$mean[gran$Granuloma=="Non-granuloma"], alternative="two.sided")
 #W = 332, p-value = 0.6489
@@ -77,8 +76,6 @@ p2<-ggplot()+
     annotate("segment", x = 1.15, xend = 1.15, y = 0.31, yend = 0.4, colour = "gray60", size=0.3)+
     annotate("segment", x = 0.85, xend = 1.15, y = 0.4, yend = 0.4, colour = "gray60", size=0.3)+
     annotate("text", x = 1, y = 0.41, colour = "gray60", label="*", size=5)
-#ggsave("Output/Figures/byGranuloma.byCohort_diversity.png", width = 4.5,height = 3,units="in", dpi=300)
-
 
 #Test gran vs. non-gran within each cohort
 cohorts<-c("Mtb NR", "Mtb R")
@@ -155,7 +152,6 @@ p3<-ggplot()+
     theme_bw()+
     theme(legend.title = element_blank())+
     theme(panel.grid.major.x = element_blank())
-#ggsave("Output/Figures/ByGranuloma.byTissueByCohort_diversity.png", width = 5.5,height = 3,units="in", dpi=300)
 
 
 pdf("Output/Figures/FigureS4_Granuloma.pdf",width=9, height=6)
@@ -171,14 +167,13 @@ dev.off()
 ## Do graunulomas within an animal differ in diversity?
 
 #remove SIV only animals since no granuloma 
-
 gran3<-Sum21[!is.na(Sum21$Granuloma)&Sum21$Granuloma=="Y",]
 monkeys=unique(gran3$Monkey)
 #Remove Monkeys with only 1 granuloma samples
 monkeys<-monkeys[!(monkeys=="3116"|monkeys=="3216")]
 
 gran3<-merge(gran3,samples[,c("filename","Sample")], by="filename")
-Mean<-gran3[,c("Monkey","Cohort","Tissue3","mean","se","se2","Sample","filename")]
+Mean<-gran3[,c("Monkey","Cohort","Tissue3","mean","se","Sample","filename")]
 colnames(Mean)[colnames(Mean)=="Sample"]<-"Location"
 Mean$Location<-gsub("\\*","",Mean$Location)
 Mean$Location<-gsub(" gran","",Mean$Location)
@@ -236,13 +231,11 @@ do.call(grid.arrange, c(P, ncol=6))
 dev.off()
 
 #Granuloma box plot
-
 AllFreq<-read.csv("Output/Diversity/Allfile_frequency.csv")
 AllFreq<-AllFreq[,-1]
 gsamples<-unique(Mean$filename)
 AllFreq<-AllFreq[AllFreq$filename %in% gsamples,]
 AllFreq<-merge(AllFreq,Mean[,c("filename","Location")], by="filename")
-#AllFreq$Tissue3<-factor(AllFreq$Tissue3, levels=c("Stock", "Plasma","Peripheral LN","Thoracic LN","Lung"))
 
 P2<-list()
 for (i in 1:length(monkeys)){
@@ -289,36 +282,22 @@ dev.off()
 
 # Age of granuloma related to diversity?
 age<-read.csv("Data/SIVR21_granulomaAge..csv")
-ov<-OvDF[age$filename]
+Ag<-Sum21[Sum21$filename %in% age$filename,]
 grandiv<-age[,c("filename","gran.age.weeks")]
 for (i in 1:nrow(age)){
-    df<-ov[[age$filename[i]]]
-    grandiv$diversity[i]<-mean(df$freq.mutations, na.rm = T)
-    grandiv$Tissue[i]<-samples2$Tissue2[samples2$filename==age$filename[i]]
-    grandiv$Cohort[i]<-samples2$Cohort[samples2$filename==age$filename[i]]
+    grandiv$diversity[i]<-Ag$mean[Ag$filename==age$filename[i]]
+    grandiv$Tissue[i]<-Ag$Tissue2[Ag$filename==age$filename[i]]
+    grandiv$Cohort[i]<- Ag$Cohort[Ag$filename==age$filename[i]]
 }
 grandiv$gran.age.weeks<-as.numeric(grandiv$gran.age.weeks)
 colnames(grandiv)[2]<-"age"
-plot(grandiv$age,grandiv$diversity)  
 
 cor.test(grandiv$age,grandiv$diversity, method="spearman")
 #p-value = 0.3708 rho =-0.2592543 
 
-ggplot(grandiv, aes(x=age, y=diversity*100, color=Cohort))+
-    geom_point()+xlab("Age of granuloma (weeks)")+ylab("Average diversity %")+
+ggplot(grandiv, aes(x=age, y=diversity*100))+
+    geom_point(color="steelblue", size=2)+xlab("Age of granuloma (weeks)")+ylab("Average diversity %")+
     annotate("text", x=15,y=0.28, label= "P=0.37", color="darkblue")+
     theme_bw()
-ggsave("Output/Diversity/Granuloma.vs.age.pdf", width = 4, height = 4)
+ggsave("Output/Figures/Granuloma.vs.age.pdf", width = 4.5, height = 4)
 
-
-
-##### # of samples ####
-
-table(samples$Cohort, samples$Tissue2)
-sam<-samples[!is.na(samples$Granuloma),]
-sam<-sam[sam$Cohort!="SIV only",]
-table(sam$Cohort, sam$Tissue2, sam$Granuloma)
-
-
-
-######

@@ -1,12 +1,9 @@
-#Read bam files and covert them to "frequency tables" and save as csv files for Ita et al. (2018) data
-
-
+# Covert bam files to "frequency tables" and save as csv files for Ita et al.'s data
 library(Rsamtools)
 library(stringr)
-
 source("Rscripts/pileupFreq.R")
 
-#dir.create("Output/CSV/")
+#dir.create("Output/CSV/Ita/")
 #number of sampels to process
 bamfiles<-list.files("Output/bam2/Ita/",pattern="bam$")
 
@@ -31,7 +28,7 @@ for (i in 1:length(bamfiles)){
   }
 
 
-# Add majNT info to obrain consensus seq
+# Add majNT info to obtain consensus seq
 csvs<-list.files("Output/CSV/Ita/")
 for (i in 1:length(csvs)){
     df<-read.csv(paste0("Output/CSV/Ita/",csvs[i]), stringsAsFactors = F, row.names = 1)

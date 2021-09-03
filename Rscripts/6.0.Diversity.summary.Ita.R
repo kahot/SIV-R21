@@ -93,7 +93,7 @@ for (j in 1:length(monkeyList)){
         summary$mutated.sites.no[i]<-nrow(alt)
         if (nrow(alt)!=0) {summary$mutated.sites[i]<-paste(alt$ref251.pos, collapse = ',')}
         else summary$mutated.sites[i]<- NA
-        
+    }
     Summary[[j]]<-summary
     
 }

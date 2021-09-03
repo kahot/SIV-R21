@@ -1,4 +1,4 @@
-#Script to analyse the frequency data and associate with features
+#Assess the control sample
 library(dplyr)
 source("Rscripts/baseRscript.R")
 

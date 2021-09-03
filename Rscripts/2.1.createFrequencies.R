@@ -1,5 +1,4 @@
-#Read frequency tables created in Step 1 and calculate them to mutation freq (SeqData) for each site
-
+#Read frequency tables created in Step 1 and calculate mutation frequencies (SeqData) for each site
 library(tidyverse)
 source("Rscripts/baseRscript.R")
 
@@ -7,9 +6,7 @@ source("Rscripts/baseRscript.R")
 #######
 SIVFiles<-list.files("Output/CSV/",pattern="csv")
 
-#Trim CSV files 
-
-
+#Trim CSV files to base 94-834
 start<-94
 end<-834
 no<-data.frame("ref251.pos"=c(start:end))
@@ -17,26 +14,23 @@ no<-data.frame("ref251.pos"=c(start:end))
 csns<-read.csv("Output/Consensus_merged.pos.csv", stringsAsFactors = F, row.names = 1)
 csns<-csns[csns$merged.pos>=start & csns$merged.pos<=end,] #741 rows
 
-
 #StockVirus consensus vs. ref251 -how many site are different?
-csns<-read.csv("Consensus_merged.pos.csv", stringsAsFactors = F, row.names = 1)
-csns<-csns[csns$merged.pos>=94 ,] #741 rows
 csns$con_count<-ifelse(csns$ref251==csns$Run_5_01_Animal_stock_virus,0,1)
 
 sum(csns$con_count) #10
-csns$ref251.pos[csns$con_count==1]
+diff<-csns[csns$con_count==1,1:3]
 #400 825 826 828 829 830 831 832 833 834
 #400 has only 2 reads, 826 has 3 reads, rest are ?
-#only 1 site differnece @825
+#only 1 site difference @825
 
 cs<-csns[,c("ref251.pos","Run_5_01_Animal_stock_virus.pos","ref251","ref239","Run_5_01_Animal_stock_virus")]
 
-# Replace the pos 825 in of ref251 and call it ref 
+# create "ref" column reflecting 'stock consensus'   
 csns$ref<-csns$ref251
 csns$ref[csns$merged.pos==825]<-"c"
 csns$ref[csns$merged.pos==826]<-"g"
 
-#"merged.pos" and "ref251.pos" are same
+##"merged.pos" and "ref251.pos" are the same
 for (i in 1:length(SIVFiles)){
     print(i)
     id<-gsub(".csv",'',paste(SIVFiles[i]))

@@ -34,7 +34,7 @@ monkeys<-names(monkeyList)
 
 
 ###############
-#remove plasma samplpes from early time points
+#remove plasma samples from early time points
 samples<-samples[samples$Tissue2!="Plasma",]
 
 Results<-list()
@@ -117,8 +117,9 @@ summary<-data.frame(monkey=monkeys)
 rna_sum<-data.frame(monkey=monkeys)
 for (i in 1:length(Diff)){
     diffT<-Diff[[i]]
+    monkey<-names(Diff)[i]
     summary[i,2:4]<-apply(diffT, 2, function(x) mean(abs(x), na.rm=T))
-    
+    lung<-samples$Tissue2[samples$Monkey==monkey&samples$Tissue2=="Lung"]
     stats<-data.frame(test=c("pLN.vs.tLN","pLN.vs.Lung","tLN.vs.Lung"))
     if (length(lung[!is.na(lung)])==0){
         r1<-wilcox.test(abs(diffT$`Plasma-pLN`),abs(diffT$`Plasma-tLN`), alternative="two.sided")
@@ -148,7 +149,6 @@ colnames(summary)[2:7]<-c("Mean_plasma-pLN","Mean_plasma-tLN","Mean_plasma-Lung"
                           "Pvalue_pLNvs.tLN","Pvalue_pLNvs.lung", "Pvalue_tLNvs.Lung")
 colnames(rna_sum)[2:4]<-c("RNA.pLN","RNA.tLN","RNA.Lung")
 
-#adjusted p-values
 write.csv(summary, "Output/MF/Difference_MF_betwTissues_mean_p-val.csv")
 write.csv(rna_sum, "Output/MF/rna.copy.no_summary.csv")
 
@@ -174,7 +174,7 @@ for (i in 1:nrow(comb)){
 }
 
 stats<-Pcorrection(wil.res)
-
+#None are significant
 
 # Assess RNA copy numbers vs. diversity relationship
 rna.sum1<-summary[,c(1:4)]
@@ -189,7 +189,7 @@ colnames(rna.summ2)[3]<-"RNA"
 rna.sum<-cbind(rna.summ1, rna.summ2[,"RNA"])
 colnames(rna.sum)[5 ]<-"RNA"
 
-plot(rna.sum$Difference, rna.sum$RNA, pch=16, col="blue")
+#plot(rna.sum$Difference, rna.sum$RNA, pch=16, col="blue")
 cor.test(rna.sum$Difference, rna.sum$RNA, method="spearman")
 #p-value =  0.6313   rho = 0.09098999 
 
@@ -210,11 +210,8 @@ for (i in 1:length(Diff)){
     summary2[i,2:4]<-apply(diffT, 2, function(x) median(abs(x), na.rm=T))
 }
 colnames(summary2)[2:4]<-c("Median_plasma.pLN","Median_plasma.tLN","Median_plasma.Lung")
-
 summary<-cbind(summary, summary2[,2:4])
-
 write.csv(summary, "Output/MF/Difference_MF_betwTissues_withMdian.csv")
-
 
 #### Plot the difference
 diff<-read.csv("Output/MF/Difference_MF_betwTissues_withMdian.csv", stringsAsFactors = F, row.names = 1)
@@ -230,9 +227,7 @@ diff<-diff[order(diff$monkey),]
 
 #colnames(diff)[2:4]<-c("plas.pLN","plas.tLN","plas.Lung")
 
-
 #### Plot median
-
 diffM2<-melt(diff[,c(1,8:11)], id.vars=c("Cohort","monkey"))
 diffM2$monkey<-factor(diffM2$monkey, levels=morder)
 cols<-c("#023FA5","#C4A12C", "#8E063B")
@@ -265,44 +260,3 @@ ggsave("Output/Figures/Difference.in.highMF.drift_median.png", width =8 , height
 
 
 
-
-aggregate(samples[,"SIV.RNA.per.tissue"], by=list(samples$Monkey), mean, na.rm=T)
-
-mean(samples[,"SIV.RNA.per.tissue"], na.rm=T)
-#48,216,291
-library(plotrix)
-std.error(samples[,"SIV.RNA.per.tissue"], na.rm=T)
-#1,661,5470
-sd(samples[,"SIV.RNA.per.tissue"], na.rm=T)
-#117,489,113
-
-
-
-Mean<-aggregate(samples[,"SIV.RNA.per.tissue"], by=list(samples$Cohort), mean, na.rm=T)
-#  Group.1        x
-#1   Mtb NR 78448773
-#2    Mtb R 18165317
-#3 SIV only 96080038
-
-se<-aggregate(samples[,"SIV.RNA.per.tissue"], by=list(samples$Cohort), std.error, na.rm=T)
-Mean$SE<-sd$x
-
-colnames(Mean)<-c("Cohort","Mean","SE") 
-
-ggplot(data=Mean, aes(x=Cohort, y=Mean))+
-    geom_point(data=samples, aes(x=Cohort,y=SIV.RNA.per.tissue),color="lightblue")+
-    geom_point()+
-    geom_errorbar(aes(ymin=Mean-SE, ymax=Mean+SE), width=.2, size=.2)
-
-    scale_y_continuous(trans = 'log10', labels=label_scientific)
-
-
-
-
-aggregate(samples[,"SIV.RNA.per.tissue"], by=list(samples$Cohort, samples$Tissue2), mean, na.rm=T)
-
-aggregate(samples[,"SIV.RNA.per.tissue"], by=list(samples$Cohort, samples$Tissue2, samples$Granuloma), mean, na.rm=T)
-
-
-
-     

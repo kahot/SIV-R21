@@ -1,12 +1,13 @@
-#Script to analyse the frequency data and associate with features
-
+# Add mutation types and associate with features to frequency data
 library(dplyr)
 source("Rscripts/baseRscript.R")
 source("Rscripts/label_scientific.R")
+
+#dir.create("Output/Overview)
 #get the file name
 SIVFiles_SeqData<-list.files("Output/SeqData/",pattern="SeqData")
 
-#create the type of mutations infor for "ref" (ref251 with 1 modification)
+#create the type of mutations info based on "ref" (ref251 with 2 modifications)
 RefDF<-read.csv("Output/SeqData/SeqData_Run_5_01_Animal_stock_virus.csv",stringsAsFactors=FALSE, row.names = 1)
 
 TypeOfSite<-c() 
@@ -28,9 +29,6 @@ for (codon in 1:(nrow(RefDF)/3)) {
     mutant2codon.tv2 <- c(WTcodon[1],transv2(WTcodon[2]), WTcodon[3])
     mutant3codon.tv2 <- c(WTcodon[1:2], transv2(WTcodon[3]))
     
-    #       }
-    
-    
     TypeOfSite<-c(TypeOfSite,typeofsitefunction(WTcodon,mutant1codon))
     TypeOfSite<-c(TypeOfSite,typeofsitefunction(WTcodon,mutant2codon))
     TypeOfSite<-c(TypeOfSite,typeofsitefunction(WTcodon,mutant3codon))
@@ -42,8 +40,6 @@ for (codon in 1:(nrow(RefDF)/3)) {
     TypeOfSite.tv2<-c(TypeOfSite.tv2,typeofsitefunction(WTcodon,mutant1codon.tv2))
     TypeOfSite.tv2<-c(TypeOfSite.tv2,typeofsitefunction(WTcodon,mutant2codon.tv2))
     TypeOfSite.tv2<-c(TypeOfSite.tv2,typeofsitefunction(WTcodon,mutant3codon.tv2))
-    
-    
 } 
 
 RefDF$Type.ref<-TypeOfSite
@@ -105,10 +101,10 @@ RefDF$AA251pos<-ceiling(RefDF$ref251.pos/3)
 RefDF$AA239pos<-ceiling(RefDF$ref239.pos/3)
 write.csv(RefDF, "Output/Ref_overview.csv")
 
+
 #RefDF<-read.csv("Output/Ref_overview.csv", stringsAsFactors = F, row.names = 1)
 
-
-#attach RefDF to each seqdaya + calculate type of mutations based on majNt
+#attach RefDF to each seqdata + calculate type of mutations based on majNt
 for (i in 1:length(SIVFiles_SeqData)){   
         id<-gsub(".csv",'',paste(SIVFiles_SeqData[i]))
         id<-gsub("SeqData_",'',id)

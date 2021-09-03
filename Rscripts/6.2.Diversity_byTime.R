@@ -6,7 +6,7 @@ library(colorspace)
 colors<-qualitative_hcl(6, palette="Dark3")
 MFcolors<-c("#EB4E61","#FF9300","#9437FF")
 
-SampleSheet<-read.csv("Data/SampleSheetMac251All.csv", stringsAsFactors =F)
+SampleSheet<-read.csv("Data/SampleSheet_Mac251.csv", stringsAsFactors =F)
 stock<-SampleSheet[SampleSheet$Tissue=="stock_virus",]
 samples<-SampleSheet[SampleSheet$Monkey!="stock_virus",]
 
@@ -117,43 +117,31 @@ ggplot()+
 ggsave("Output/Figures/Diversity_overTime_byMonkey_R21_plasma_only.png", units="in", width = 4.5, height = 2.5, dpi=300)
 
 
-ggplot()+
-    geom_point(data=means, aes(x=Week, y=mean, group=factor(Monkey), color=factor(Monkey), shape=Cohort), size=1.5 )+
-    geom_line(data=means, aes(x=Week, y=mean, group=Monkey, color=factor(Monkey)),stat = "identity",linetype = 1, size=0.2)+
-    scale_y_continuous(breaks=c(0.002,0.003,0.004,0.005),labels=c(0.2,0.3,0.4,0.5),  limits=c(0.0015,0.005))+
-    scale_x_continuous(breaks=c(0,2, 4, 6,8), labels=c("stock", 2, 4, 6, 8))+
-    geom_point(data=means, aes(x=0, y=adds[1,"mean"]), color="red",  size=1.5 )
-    #scale_color_manual(values=colors[c(5,3,1)])+
-    #theme_bw()+
-    #theme(plot.title = element_text(size=11))+
-    #theme(panel.grid.major.x=element_blank(),panel.grid.minor.x=element_blank())+
-    #ylab("% Average diversity")+xlab('Weeks post-infection')+
-    ##scale_color_manual(values=c('#00BA38','#F8766D','#619CFF'), labels=c("Mean", "Syn mean", "NS mean"))+
-    #theme(legend.title = element_blank())
-ggsave("Output/Figures/Plasam_diversity_overTime_byMonkey.pdf", width = 6, height = 5)
+# By cohort
 
 df<-means[means$Cohort=="SIV only",]
 ggplot()+
-    geom_point(data=df, aes(x=Week, y=mean, group=factor(Monkey), color=factor(Monkey), shape=Cohort), size=1.5 )+
-    geom_line(data=df, aes(x=Week, y=mean, group=Monkey, color=factor(Monkey)),stat = "identity",linetype = 1, size=0.2)+
+    geom_point(data=df, aes(x=Week, y=mean,  color=factor(Monkey), shape=Cohort), size=1.5 )+
+    geom_line(data=df, aes(x=Week, y=mean, color=factor(Monkey)),stat = "identity",linetype = 1, size=0.2)+
     scale_y_continuous(breaks=c(0.002,0.003,0.004,0.005),labels=c(0.2,0.3,0.4,0.5),  limits=c(0.0015,0.005))+
     scale_x_continuous(breaks=c(0,2, 4, 6,8), labels=c("stock", 2, 4, 6, 8))+
-    geom_point(data=df, aes(x=0, y=adds[1,"mean"]), color="red",  size=1.5 )
+    geom_point(data=df, aes(x=0, y=adds[1,"mean"]), color="red",  size=1.5 )+
+    theme(legend.title = element_blank())
 
 df2<-means[means$Cohort=="Mtb NR",]
-
 ggplot()+
     geom_point(data=df2, aes(x=Week, y=mean, group=factor(Monkey), color=factor(Monkey), shape=Cohort), size=1.5 )+
     geom_line(data=df2, aes(x=Week, y=mean, group=Monkey, color=factor(Monkey)),stat = "identity",linetype = 1, size=0.2)+
     scale_y_continuous(breaks=c(0.002,0.003,0.004,0.005),labels=c(0.2,0.3,0.4,0.5),  limits=c(0.0015,0.005))+
     scale_x_continuous(breaks=c(0,2, 4, 6,8), labels=c("stock", 2, 4, 6, 8))+
-    geom_point(data=df2, aes(x=0, y=adds[1,"mean"]), color="red",  size=1.5 )
+    geom_point(data=df2, aes(x=0, y=adds[1,"mean"]), color="red",  size=1.5 )+
+    theme(legend.title = element_blank())
 
 df3<-means[means$Cohort=="Mtb R",]
-
 ggplot()+
     geom_point(data=df3, aes(x=Week, y=mean, group=factor(Monkey), color=factor(Monkey), shape=Cohort), size=1.5 )+
     geom_line(data=df3, aes(x=Week, y=mean, group=Monkey, color=factor(Monkey)),stat = "identity",linetype = 1, size=0.2)+
     scale_y_continuous(breaks=c(0.002,0.003,0.004,0.005),labels=c(0.2,0.3,0.4,0.5),  limits=c(0.0015,0.005))+
     scale_x_continuous(breaks=c(0,2, 4, 6,8), labels=c("stock", 2, 4, 6, 8))+
-    geom_point(data=df3, aes(x=0, y=adds[1,"mean"]), color="red",  size=1.5 )
+    geom_point(data=df3, aes(x=0, y=adds[1,"mean"]), color="red",  size=1.5 )+
+    theme(legend.title = element_blank())

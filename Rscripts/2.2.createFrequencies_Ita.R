@@ -1,5 +1,5 @@
-#Read frequency tables created in Step 1 and calculate them to mutation freq (SeqData) for each site for Ita et al. (2018) data.
-
+#Read frequency tables created in Step 1 and calculate mutation frequencies (SeqData) 
+#for each site for It et al.'s data 
 library(tidyverse)
 source("Rscripts/baseRscript.R")
 

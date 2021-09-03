@@ -1,4 +1,4 @@
-#Diversity comparison of all samples, remove nt pos 395-540
+#Diversity comparison of all samples (remove nt pos 395-540)
 library(DataCombine)
 library(dplyr)
 source("Rscripts/label_scientific.R")
@@ -15,9 +15,6 @@ for (i in 1:length(OverviewFiles)){
 
 #sample info
 SampleSheet<-read.csv("Data/SampleSheetMac251All.csv", stringsAsFactors =F)
-stock<-SampleSheet[SampleSheet$Tissue=="stock_virus",]
-samples<-SampleSheet[SampleSheet$Monkey!="stock_virus",]
-
 #rename the tissue for labeling consistency for later ("Plasma","Plasma_nex","pLN","tLN","Lung")
 SampleSheet$Tissue2[SampleSheet$Tissue2=="plasma"]<-"Plasma"
 SampleSheet$Tissue2[SampleSheet$Tissue2=="Plasma"&SampleSheet$Week>5]<-"Plasma_nex"
@@ -27,8 +24,12 @@ SampleSheet$Tissue3<-SampleSheet$Tissue2
 SampleSheet$Tissue3[SampleSheet$Tissue3=="Plasma_nex"]<-"Plasma nex"
 SampleSheet$Tissue3[SampleSheet$Tissue3=="tLN"]<-"Thoracic LN"
 SampleSheet$Tissue3[SampleSheet$Tissue3=="pLN"]<-"Peripheral LN"
-
 write.csv(SampleSheet,"Data/SampleSheet_Mac251.csv", row.names = F)
+
+stock<-SampleSheet[SampleSheet$Tissue=="stock_virus",]
+samples<-SampleSheet[SampleSheet$Monkey!="stock_virus",]
+
+
 
 
 #calculate mean/median MINOR VARIANT frequency (= diversity / divergence) for all files
@@ -85,26 +86,12 @@ for (i in 1:length(OvDF)){
         if (nrow(alt)!=0) {summary$mutated.sites[i]<-paste(alt$ref251.pos, collapse = ',')}
         else summary$mutated.sites[i]<- NA
         summary$se[i]<-sqrt(summary$mean[i]*(1-summary$mean[i])/sum(df$TotalReads, na.rm=T))
-        summary$se2[i]<-sqrt(summary$mean[i]*(1-summary$mean[i])/mean(df$TotalReads, na.rm=T))
-        #summary$se3[i]<-sqrt(sum(df$var,na.rm=T))
-        summary2$mean[i]<-mean(df$freq.mutations[df$freq.mutations>0.005], na.rm=T)
 }
-
 write.csv(summary,"Output/Diversity_summary_R21.csv")
 
 
 
 #Create a data frame for all raw frequencies
-siv<-summary[summary$Cohort=="SIV only",]
-mean(siv$mean, na.rm=T)
-R<-summary[summary$Cohort=="Mtb R",]
-mean(R$mean, na.rm=T)
-NR<-summary[summary$Cohort=="Mtb NR",]
-mean(NR$mean, na.rm=T)
-
-
-
-
 
 AllFreq<-data.frame()
 for (i in 1:nrow(samples)){
