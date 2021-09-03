@@ -27,4 +27,12 @@ done
 ### 2. After mapping is done, start the analysis in R by following the file numbers
 
     • Scripts 1 to 3 create frequency tables for each bam file.
-     
+    • Script 4 analyze the stock and control files 
+    • Script 5 assess trasnmitted/founder variants 
+    • Script 6 assess SIV diversity across tissues/time/cohorts and compare with RNA copy nubmers and CD4/CD8 frequency
+    • Script 7 analyze the indels 
+    • Script 8 assess the known immune escape mutations 
+    • Script 9 assess an intereting mutation at AA112
+    • Script 10 analyze the effects of genetic drift between tissues
+    • Script 11 conducts glmm to udnerstand the effects of different factors on SIV diversity
+    
