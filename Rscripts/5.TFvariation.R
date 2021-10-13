@@ -6,7 +6,6 @@ library(gridExtra)
 library(gtable)
 library(grid)
 library(colorspace)
-#colors<-qualitative_hcl(6, palette="Dark3")
 colors<-qualitative_hcl(6, palette="Pastel1")
 MFcolors<-c("#fb8072","#FF9300","#9437FF")
 
@@ -30,15 +29,14 @@ samples<-SampleSheet[SampleSheet$Monkey!="stock_virus",]
 early<-samples[samples$Week<4,]
 TF<-OvDF[early$filename]
 
-#create a dataframe to plot all together using facet_grid
-#summary<-sample[,c("Monkey","Tissue","Week","filename")]
+#create a data frame to plot all together using facet_grid
 
 freq<-data.frame()
 miss<-data.frame()
 for (i in 1:length(TF)){
     id<-early$filename[i]
     df<-TF[[id]]
-    #complile syn and ns freq info
+    #compile syn and ns freq info
     df[which(df$TotalReads<100),17:26]<-NA
     df<-df[df$AA251pos<276,]
     
@@ -88,7 +86,7 @@ for (i in 1:length(TF)){
 }
 
 
-#eliminate low freq for a cleaner plot
+#eliminate super low freq for a cleaner plot
 freq$freq[freq$freq<=0.005]<-NA
 freq<-freq[freq$AA239pos<272,]
 freq<-freq[!is.na(freq$AA239pos),]
