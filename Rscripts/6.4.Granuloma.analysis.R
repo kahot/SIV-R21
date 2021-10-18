@@ -154,7 +154,9 @@ p3<-ggplot()+
     theme(panel.grid.major.x = element_blank())
 
 
-pdf("Output/Figures/FigureS4_Granuloma.pdf",width=9, height=6)
+pdf("Output/Figures/FigureS5_Granuloma.pdf",width=9, height=6)
+png("Output/Figures/FigureS5_Granuloma.png",width=9, height=6, units="in",res = 300)
+
 ggdraw()+
     draw_plot(p1,0,0.5,0.36,0.5)+
     draw_plot(p2,0.36,0.5,0.58,0.5)+
