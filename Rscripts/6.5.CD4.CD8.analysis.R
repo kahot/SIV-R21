@@ -57,9 +57,16 @@ Plots[[2]]<-ggplot(cd4, aes(x=CD8.percent*100, y=mean*100))+
     theme(axis.title.y = element_text(color="white"))
 
 
-pdf("Output/Figures/CD4.CD8.MtbR.Lung.only.pdf", width = 8, height = 3.8)
-do.call(grid.arrange, c(Plots, ncol=2))
+png("Output/Figures/CD4.CD8.MtbR.Lung.only.png", width = 8, height = 3.8, res=300, unit="in")
+ggdraw()+
+    draw_plot(Plots[[1]],x=0,y=0,width=0.5,height=1)+
+    draw_plot(Plots[[2]],x=0.5,y=0,width=0.5,height=1)+
+    draw_plot_label(c("A", "B"), c(0, 0.5), c(1, 1), size = 15)
 dev.off()
+
+
+
+
 
 cd4$ratio<-cd4$CD4.percent/cd4$CD8.percent
 cor.test(cd4$ratio, cd4$mean, method="spearman")
