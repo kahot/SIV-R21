@@ -56,23 +56,35 @@ write.csv(wil.res, paste0("Output/Diversity/Tests/Cohorts_div_wilcox_results.csv
 
 
 #2. Diverstiy by Tissue types by Cohort
-infec<-Sum21[,c("Cohort","Tissue3","Week","mean", "se")]
+infec<-Sum21[,c("Cohort","Tissue3","Week","mean", "se", "Monkey","Granuloma")]
 colnames(infec)[2]<-"Tissue"
 
 infec$Cohort<-factor(infec$Cohort, levels=c("SIV only", "Mtb NR", "Mtb R"))
+infec$Monkey<-factor(infec$Monkey, levels=c("3316","3616","3816","4016","30816","3116","3216","16314","20615","31316","3516"))
+
 by.Coh<- aggregate(infec["mean"],by=list(infec$Cohort),mean,na.rm=T )
 by.Coh$Group.1<-factor(by.Coh$Group.1, levels=c("SIV only", "Mtb NR", "Mtb R"))
 
+medi<-aggregate(infec["mean"],by=list(infec$Cohort),median,na.rm=T )
+medi$Group.1<-factor(medi$Group.1, levels=c("SIV only", "Mtb NR", "Mtb R"))
+
 #Plot cohort results (Fig.5A)
+
 p1<-ggplot()+
-    geom_point(data=infec, aes(x=Cohort, y=mean*100, color=Cohort),size=2.3, position=position_jitter(width=0.05))+
+    geom_point(data=infec, aes(x=Cohort, y=mean*100, color=Cohort, shape=Monkey),size=2.3,
+               position=position_jitter(width=0.07))+
+    geom_point(data=medi, aes(x=Group.1, y=mean*100), color="black",size=2.3, shape=1)+
     geom_point(data=by.Coh, aes(x=Group.1, y=mean*100), color="black",size=2.3, shape=4)+
     xlab('')+ylab('% Average diversity')+
+    scale_shape_manual(values=c(16,17,4,15,16,17,4,16,17,4,15), guide='none')+
     scale_color_manual(values=paste0(colors[c(5,3,1)],"66"), guide='none')+
     theme(legend.title = element_blank())+
     scale_y_continuous(limits = c(0.1, 0.55))+
     theme_bw()+
-    theme(panel.grid.major.x = element_blank())
+    theme(panel.grid.major.x = element_blank())+
+    annotate("text", x=2.6, y=0.55, label="x: mean"  , hjust=0,size=3)+
+    annotate("text", x=2.6, y=0.52,  label="o: median",hjust=0,size=3)
+    
 
 #### Wilcoxon test on diversity between cohort by tissues ###
 #comparison pairs 
@@ -133,19 +145,24 @@ which(infec$Tissue=="Lung"& infec$Cohort=="Mtb NR")
 infec$mean[67]<-0.00195
 infec$mean[64]<-0.00205
 
+#samples with granuloma
+infec$mean2<-infec$mean
+infec$mean2[infec$Granuloma!="Y"]<-NA
+infec$mean2[is.na(infec$Granuloma)]<-NA
+
 p2<-ggplot()+
     geom_point(data=infec, aes(x=Tissue, y=mean*100, color=Cohort),alpha=0.6,
                position=position_jitterdodge(jitter.width = 0.1,jitter.height = 0,
                                              dodge.width = 0.5), size=2)+
+    geom_point(data=infec, aes(x=Tissue, y=mean2*100, color=Cohort, fill=Cohort),size=2.2, shape=21, color="gray10",
+               position = position_dodge(width = .5))+xlab('')+ylab('% Average diversity')+
     geom_point(data=sivMean, aes(x=Tissue, y=Mean*100, fill=Cohort), size=1.7,position = position_dodge(width = 0.5), shape=4)+
-    xlab('')+ylab('% Average diversity')+
     theme(legend.title = element_blank())+
     scale_y_continuous(limits = c(0.16,0.49))+
     scale_color_manual(values=colors[c(5,3,1)])+
-    scale_fill_manual(values=c(1,1,1),guide="none")+
+    scale_fill_manual(values=colors[c(5,3,1)],guide="none")+
     theme(theme(legend.title = element_blank()))+theme_bw()+
     theme(legend.title = element_blank(), panel.grid.major.x = element_blank())
-
 
 #######
 ### Test if diversity in one tissue type is different from another tissue within each monkey
