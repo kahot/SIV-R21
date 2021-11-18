@@ -73,18 +73,18 @@ medi$Group.1<-factor(medi$Group.1, levels=c("SIV only", "Mtb NR", "Mtb R"))
 p1<-ggplot()+
     geom_point(data=infec, aes(x=Cohort, y=mean*100, color=Cohort, shape=Monkey),size=2.3,
                position=position_jitter(width=0.07))+
-    geom_point(data=medi, aes(x=Group.1, y=mean*100), color="black",size=2.3, shape=1)+
+    geom_point(data=medi, aes(x=Group.1, y=mean*100), color="black",size=2.3, shape=3)+
     geom_point(data=by.Coh, aes(x=Group.1, y=mean*100), color="black",size=2.3, shape=4)+
     xlab('')+ylab('% Average diversity')+
-    scale_shape_manual(values=c(16,17,4,15,16,17,4,16,17,4,15), guide='none')+
+    scale_shape_manual(values=c(16,24,15,18,16,24,15,16,24,15,18), guide='none')+
     scale_color_manual(values=paste0(colors[c(5,3,1)],"66"), guide='none')+
     theme(legend.title = element_blank())+
     scale_y_continuous(limits = c(0.1, 0.55))+
     theme_bw()+
-    theme(panel.grid.major.x = element_blank())+
-    annotate("text", x=2.6, y=0.55, label="x: mean"  , hjust=0,size=3)+
-    annotate("text", x=2.6, y=0.52,  label="o: median",hjust=0,size=3)
-    
+    theme(panel.grid.major.x = element_blank())
+    #annotate("text", x=2.7, y=0.55, label="x: Mean"  , hjust=0,size=3)+
+    #annotate("text", x=2.7, y=0.52, label="+: Median",hjust=0,size=3)
+ 
 
 #### Wilcoxon test on diversity between cohort by tissues ###
 #comparison pairs 
@@ -132,12 +132,21 @@ write.csv(Re, "Output/Diversity/Tests/Cohort_comparison_Wilcox_results_all.csv")
 #calculate the averages
 sivMean<-aggregate(infec[,"mean"],by=list(infec$Cohort, infec$Tissue),mean,na.rm=T )
 colnames(sivMean)<-c("Cohort", "Tissue","Mean")
+sivMedian<-aggregate(infec[,"mean"],by=list(infec$Cohort, infec$Tissue),median,na.rm=T )
+colnames(sivMedian)<-c("Cohort", "Tissue","Median")
 
 #Order the factors
 infec$Tissue<-factor(infec$Tissue, levels = c("Plasma","Plasma nex","Peripheral LN","Thoracic LN","Lung"))
 sivMean$Tissue<-factor(sivMean$Tissue, levels = c("Plasma","Plasma nex","Peripheral LN","Thoracic LN","Lung"))
+sivMedian$Tissue<-factor(sivMedian$Tissue, levels = c("Plasma","Plasma nex","Peripheral LN","Thoracic LN","Lung"))
+
 infec$Cohort<-factor(infec$Cohort, levels=c("SIV only", "Mtb NR", "Mtb R"))
 sivMean$Cohort<-factor(sivMean$Cohort, levels=c("SIV only", "Mtb NR", "Mtb R"))
+sivMedian$Cohort<-factor(sivMedian$Cohort, levels=c("SIV only", "Mtb NR", "Mtb R"))
+
+#add dummy size info
+sivMedian$size<-"a"
+sivMedian$size[1]<-"b"
 
 #add jitter to one of the lung 
 which(infec$Tissue=="Lung"& infec$Cohort=="Mtb NR")
@@ -150,20 +159,29 @@ infec$mean2<-infec$mean
 infec$mean2[infec$Granuloma!="Y"]<-NA
 infec$mean2[is.na(infec$Granuloma)]<-NA
 
+infec$mean[!is.na(infec$mean2)]<-NA
+
+
 p2<-ggplot()+
-    geom_point(data=infec, aes(x=Tissue, y=mean*100, color=Cohort),alpha=0.6,
-               position=position_jitterdodge(jitter.width = 0.1,jitter.height = 0,
-                                             dodge.width = 0.5), size=2)+
-    geom_point(data=infec, aes(x=Tissue, y=mean2*100, color=Cohort, fill=Cohort),size=2.2, shape=21, color="gray10",
-               position = position_dodge(width = .5))+xlab('')+ylab('% Average diversity')+
+    geom_point(data=infec, aes(x=Tissue, y=mean*100, color=Cohort, fill=Cohort,shape=Monkey, group=Cohort),alpha=0.6,
+               position=position_jitterdodge(jitter.width = 0.3,jitter.height = 0,
+                                           dodge.width = 0.5), size=2)+
+    geom_point(data=infec, aes(x=Tissue, y=mean2*100, color=Cohort, fill=Cohort,shape=Monkey,group=Cohort),size=2.2, color="gray10",alpha=0.6,
+               position=position_jitterdodge(jitter.width = 0.3,jitter.height = 0,
+                                             dodge.width = 0.5))+
+    xlab('')+ylab('% Average diversity')+
     geom_point(data=sivMean, aes(x=Tissue, y=Mean*100, fill=Cohort), size=1.7,position = position_dodge(width = 0.5), shape=4)+
+    geom_point(data=sivMedian, aes(x=Tissue, y=Median*100, fill=Cohort,size = size),position = position_dodge(width = 0.5), shape=3)+
     theme(legend.title = element_blank())+
     scale_y_continuous(limits = c(0.16,0.49))+
     scale_color_manual(values=colors[c(5,3,1)])+
     scale_fill_manual(values=colors[c(5,3,1)],guide="none")+
+    scale_shape_manual(values=c(21,24,22,23,21,24,22,21,24,22,23), guide="none")+
+    scale_size_manual(values = c(1.7, 1.7), labels = c("Mean", "Median")) +  # Provides a legend for the Averages but looks ugly.....
     theme(theme(legend.title = element_blank()))+theme_bw()+
-    theme(legend.title = element_blank(), panel.grid.major.x = element_blank())
-
+    theme(legend.title = element_blank(), panel.grid.major.x = element_blank())+
+    guides(size = guide_legend(override.aes = list(shape = c(4, 3))))
+p2
 #######
 ### Test if diversity in one tissue type is different from another tissue within each monkey
 
@@ -224,6 +242,25 @@ for (j in 1:length(monkeys)){
 }
 write.csv(Results, "Output/Diversity/Tests/Wilcox_results_all.csv")
 
+#Test if diversity differ between tissue types regardless of cohorts
+tis<-unique(as.character(infec$Tissue))
+comb<-combn(tis,2)
+comb<-t(comb)
+comb_pairs<-apply(comb, 1,function(x) paste0(x[1],".vs.",x[2]))
+
+wil.res<-data.frame(Test=comb_pairs)
+for (i in 1:nrow(comb)){
+    v1<-infec$mean[infec$Tissue==comb[i,1]]
+    v2<-infec$mean[infec$Tissue==comb[i,2]]
+    
+    re1<-wilcox.test(v1, v2, alternative ="two.sided")
+    wil.res$rawP[i]<-re1[[3]]
+    wil.res$mean1[i]<-mean(v1, na.rm=T)
+    wil.res$mean2[i]<-mean(v2, na.rm=T)
+    #which is higher in diversity
+    wil.res$higher[i]<-ifelse((wil.res$mean1[i]-wil.res$mean2[i])>0, comb[i,1],comb[i,2])
+}
+wil.res<-Pcorrection(wil.res)
 
 
 ## Plot all diversity (Fig.5C)
@@ -243,11 +280,11 @@ labels<-unique(all_mean$label)
 all_mean$label<-factor(all_mean$label, levels=paste(labels))
 
 #plot all freq
-AllFreq<-read.csv("Output/Diversity/Allfile_frequency.csv")
-AllFreq<-AllFreq[,-1]
-AllFreq$label<-factor(AllFreq$label, levels=paste(labels))
-AllFreq$Tissue3[AllFreq$Tissue3=="Plasma nex"]<-"Plasma"
-AllFreq$Tissue3<-factor(AllFreq$Tissue3, levels=c("Stock", "Plasma","Peripheral LN","Thoracic LN","Lung"))
+#AllFreq<-read.csv("Output/Diversity/Allfile_frequency.csv")
+#AllFreq<-AllFreq[,-1]
+#AllFreq$label<-factor(AllFreq$label, levels=paste(labels))
+#AllFreq$Tissue3[AllFreq$Tissue3=="Plasma nex"]<-"Plasma"
+#AllFreq$Tissue3<-factor(AllFreq$Tissue3, levels=c("Stock", "Plasma","Peripheral LN","Thoracic LN","Lung"))
 
 #data for cohort and monkey info for the plot
 dat<-distinct(all_mean, label, .keep_all=T) #50 rows
@@ -312,15 +349,14 @@ p3<-ggplot()+
 
 
 
-
 #Figure 5
 #draw_plot(plot, x, y, width, height)
 png("Output/Figures/Figure5.png",width=9, height=6, units="in",res=300)
 ggdraw()+
-    draw_plot(p1,0,0.5,0.36,0.5)+
-    draw_plot(p2,0.36,0.5,0.6,0.5)+
-    draw_plot(p3,0,0,1,0.5)+
-    draw_plot_label(c("A", "B", "C"), c(0, 0.36, 0), c(1, 1, 0.5), size = 15)
+    draw_plot(p1,0,0.5,0.35,0.49)+
+    draw_plot(p2,0.35,0.5,0.62,0.49)+
+    draw_plot(p3,0,0,1,0.49)+
+    draw_plot_label(c("A", "B", "C"), c(0, 0.35, 0), c(1, 1, 0.5), size = 15)
 dev.off()    
 
 
@@ -376,10 +412,12 @@ wilcox.test(rna2$mean[rna2$Tissue3=="Lung"], rna2$mean[rna2$Tissue3=="Thoracic L
 #RNA copy number summary for each cohort and tissue
 rna<-rna[!(rna$Tissue3=="Plasma"|rna$Tissue3=="Plasma nex"),]
 
-RNAsum<-data.frame(aggregate(rna[,"SIV.RNA.per.tissue"], by=list(rna$Cohort,rna$Tissue3), mean, na.rm=T))
-colnames(RNAsum)<-c("Cohort", "Tissue", "Mean")
-se<-data.frame(aggregate(rna[,"SIV.RNA.per.tissue"], by=list(rna$Cohort,rna$Tissue3), std.error, na.rm=T))
-RNAsum$SE<-se$x
+RNAsum<-data.frame(aggregate(rna[,"SIV.RNA.per.tissue"], by=list(rna$Cohort,rna$Tissue3), median, na.rm=T))
+colnames(RNAsum)<-c("Cohort", "Tissue", "Median")
+ranges<-aggregate(rna[,"SIV.RNA.per.tissue"], by=list(rna$Cohort,rna$Tissue3), range)
+ranges<-ranges$x
+RNAsum$range_down<-ranges[,1]
+RNAsum$range_up<-ranges[,2]
 
 write.csv(RNAsum,"Output/RNA.summary.perCohortperTissue.csv")
 

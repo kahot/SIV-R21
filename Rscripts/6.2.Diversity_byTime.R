@@ -29,7 +29,7 @@ weekm<-melt(by.weeks, id.vars = "Week")
 
 #cols<-c('#00BA38','#F8766D','#619CFF')
 
-ggplot()+
+p1<-ggplot()+
     geom_point(data=weeksm, aes(x=Week, y=value, color=variable), position = position_dodge(width = 0.5), size=1.2,alpha = 0.4 )+
     geom_point(data=weekm, aes(x=Week, y=value, color=variable), position = position_dodge(width = 0.5),size=2)+
     geom_line(data=weekm, aes(x=Week, y=value, group=factor(variable),color=variable),position = position_dodge(width = 0.5),stat = "identity",linetype = 1, size=0.2)+
@@ -42,7 +42,7 @@ ggplot()+
     ylab("% Average diversity")+xlab('Weeks post-infection')+
     scale_color_manual(values=MFcolors[c(1,3,2)], labels=c("Total", "Syn mean", "NS mean"))+
     theme(legend.title = element_blank())
-ggsave("Output/Figures/Diversity_overTime_byWeek_R21.png", units="in", width = 4.5, height = 2.5, dpi=300)
+#ggsave("Output/Figures/Diversity_overTime_byWeek_R21.png", units="in", width = 4.5, height = 2.5, dpi=300)
 
 
 ## By week with Sergio's data
@@ -68,7 +68,6 @@ weekm2$Study<-"Ita"
 weeksm2<-weeksm2[weeksm2$Week<=10,]
 weekm2<-weekm2[weekm2$Week<=10,]
 
-
 Wksm<-rbind(weeksm, weeksm2)
 Wkm<-rbind(weekm,weekm2)
 
@@ -85,7 +84,7 @@ ggplot(data=Wkm, aes(x=Week, y=value, color=variable,shape=Study,group=interacti
     scale_color_manual(values=MFcolors[c(1,3,2)], labels=c("Total", "Syn mean", "NS mean"))+
     scale_shape_manual(values=c(17,16))+
     theme(legend.title = element_blank())
-ggsave("Output/Figures/Diversity_overTime_byWeek_both.png", units="in", width = 6.5, height = 4, dpi=300)
+ggsave("Output/Figures/Diversity_overTime_byWeek_both.png", units="in", width = 7, height = 4, dpi=300)
 
 
 
@@ -101,7 +100,7 @@ means<-rbind(adds, means)
 
 means$Cohort<-factor(means$Cohort, levels=c("SIV only", "Mtb NR", "Mtb R"))
 
-ggplot()+
+p2<-ggplot()+
     geom_point(data=means, aes(x=Week, y=mean, group=factor(Monkey), color=factor(Cohort)),  size=1.5 )+
     geom_line(data=means, aes(x=Week, y=mean, group=Monkey, color=factor(Cohort)),stat = "identity",linetype = 1, size=0.2)+
     scale_y_continuous(breaks=c(0.002,0.003,0.004,0.005),labels=c(0.2,0.3,0.4,0.5),  limits=c(0.0015,0.005))+
@@ -114,11 +113,18 @@ ggplot()+
     ylab("% Average diversity")+xlab('Weeks post-infection')+
     #scale_color_manual(values=c('#00BA38','#F8766D','#619CFF'), labels=c("Mean", "Syn mean", "NS mean"))+
     theme(legend.title = element_blank())
-ggsave("Output/Figures/Diversity_overTime_byMonkey_R21_plasma_only.png", units="in", width = 4.5, height = 2.5, dpi=300)
+#ggsave("Output/Figures/Diversity_overTime_byMonkey_R21_plasma_only.png", units="in", width = 4.5, height = 2.5, dpi=300)
+
+png("Output/Figures/Figure4.png", width = 5, height = 6, res=300, unit="in")
+ggdraw()+
+    draw_plot(p1,x=0,y=0.50,width=1,height=0.45)+
+    draw_plot(p2,x=0,y=0,width=0.98,height=0.45)+
+    draw_plot_label(c("A", "B"), c(0, 0), c(1, 0.5), size = 15)
+dev.off()
+
 
 
 # By cohort
-
 df<-means[means$Cohort=="SIV only",]
 ggplot()+
     geom_point(data=df, aes(x=Week, y=mean,  color=factor(Monkey), shape=Cohort), size=1.5 )+

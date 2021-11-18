@@ -13,23 +13,13 @@ for (i in 1:length(OverviewFiles)){
     names(OvDF)[i]<-gsub("_overview.csv",'',OverviewFiles[i])
 }
 
-#sample info
-SampleSheet<-read.csv("Data/SampleSheetMac251All.csv", stringsAsFactors =F)
-#rename the tissue for labeling consistency for later ("Plasma","Plasma_nex","pLN","tLN","Lung")
-SampleSheet$Tissue2[SampleSheet$Tissue2=="plasma"]<-"Plasma"
-SampleSheet$Tissue2[SampleSheet$Tissue2=="Plasma"&SampleSheet$Week>5]<-"Plasma_nex"
-SampleSheet$Tissue2[SampleSheet$Tissue2=="Thoracic LN"]<-"tLN"
-unique(SampleSheet$Tissue2)
-SampleSheet$Tissue3<-SampleSheet$Tissue2
-SampleSheet$Tissue3[SampleSheet$Tissue3=="Plasma_nex"]<-"Plasma nex"
-SampleSheet$Tissue3[SampleSheet$Tissue3=="tLN"]<-"Thoracic LN"
-SampleSheet$Tissue3[SampleSheet$Tissue3=="pLN"]<-"Peripheral LN"
-write.csv(SampleSheet,"Data/SampleSheet_Mac251.csv", row.names = F)
+#sample metadata
+SampleSheet<-read.csv("Data/SampleSheet_Mac251.csv", stringsAsFactors =F)
 
+#stock info
 stock<-SampleSheet[SampleSheet$Tissue=="stock_virus",]
+#remove stock and control 
 samples<-SampleSheet[SampleSheet$Monkey!="stock_virus",]
-
-
 
 
 #calculate mean/median MINOR VARIANT frequency (= diversity / divergence) for all files

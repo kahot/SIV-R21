@@ -27,7 +27,6 @@ gran<-gran[!is.na(gran$Granuloma),] #50 samples
 gran$Granuloma[gran$Granuloma=="Y"]<-"Granuloma"
 gran$Granuloma[gran$Granuloma=="N"]<-"Non-granuloma"
 
-
 by.gran<- aggregate(gran["mean"],by=list(gran$Granuloma),mean,na.rm=T )
 
 p1<-ggplot()+
@@ -163,6 +162,12 @@ ggdraw()+
     draw_plot(p3,0,0,0.75,0.5)+
     draw_plot_label(c("A", "B", "C"), c(0, 0.36, 0), c(1, 1, 0.5), size = 15)
 dev.off()    
+
+
+length(unique(gran2$Monkey[gran2$Granuloma=="Granuloma"& gran2$Cohort=="Mtb R"& gran2$Tissue2=="tLN"]))
+length(unique(gran2$Monkey[gran2$Granuloma=="Non-granuloma"& gran2$Cohort=="Mtb R"& gran2$Tissue2=="Lung"]))
+
+
 
 
 ######################################################

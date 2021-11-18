@@ -2,10 +2,10 @@ library(glmmTMB)
 library(reshape2)
 library(ggplot2)
 library(bbmle) 
-#library(DHARMa)
+library(DHARMa)
 library(car)
 library(effects)
-#library(MuMIn)
+library(MuMIn)
 #library(glmmLasso)
 library(cowplot)
 library(gridExtra)
@@ -16,7 +16,7 @@ SampleSheet<-read.csv("Data/SampleSheet_Mac251.csv", stringsAsFactors =F)
 samples<-SampleSheet[SampleSheet$Monkey!="stock_virus",]
 summary<-read.csv("Output/Diversity_summary_R21.csv", stringsAsFactors = F, row.names = 1)
 Sum<-summary[1:69,]
-Sum<-merge(Sum[,c(1,2,3,5,6,10)], samples[,c("filename","Granuloma","SIV.RNA.per.tissue")], by="filename")
+Sum<-merge(Sum[,c(1,2,3,5,6,10)], samples[,c("filename","Granuloma")], by="filename")
 
 colnames(Sum)[colnames(Sum)=="Tissue2"]<-"Tissue"
 #create ID
@@ -35,26 +35,27 @@ Sum$Tissue<-factor(Sum$Tissue, levels = c("Plasma", "Plasma_nex", "pLN", "tLN","
 beta<-glmmTMB(mean~ Week+ Tissue+Cohort+(1|Monkey), data=Sum, family=beta_family())
 summary(beta)
 #Conditional model:
-#Estimate Std. Error z value Pr(>|z|)    
-#(Intercept)      -6.026e+00  1.192e-01  -50.54   <2e-16 ***
-#Week             -4.541e-02  2.970e-02   -1.53   0.1263    
-#TissuePlasma_nex  2.340e-01  1.397e-01    1.68   0.0938 .  
-#TissuepLN         1.950e-01  1.444e-01    1.35   0.1770    
-#TissuetLN         2.911e-01  1.415e-01    2.06   0.0396 *  
-#TissueLung        2.319e-01  1.440e-01    1.61   0.1072    
-#CohortMtb NR      1.963e-01  9.661e-02    2.03   0.0422 *  
-#CohortMtb R       9.237e-05  8.770e-02    0.00   0.9992  
+#                 Estimate Std. Error z value Pr(>|z|)    
+#(Intercept)      -5.99148    0.12409  -48.28   <2e-16 ***
+#Week             -0.05117    0.02908   -1.76   0.0785 .  
+#TissuePlasma_nex  0.26463    0.14067    1.88   0.0600 .  
+#TissuepLN         0.22632    0.14528    1.56   0.1193    
+#TissuetLN         0.32182    0.14206    2.27   0.0235 *  
+#TissueLung        0.26151    0.14368    1.82   0.0687 .  
+#CohortMtb NR      0.17938    0.09269    1.94   0.0530 .  
+#CohortMtb R      -0.01979    0.08595   -0.23   0.8179    
 
 
 #look at the residuals
 beta1<- simulateResiduals(beta)
 plot(beta1)
+
 Anova(beta, type=3)
 #Response: mean
 #Chisq Df Pr(>Chisq)  
-#Week    2.3377  1    0.12628  
-#Tissue  8.4053  4    0.07781 .
-#Cohort  5.4980  2    0.06399 .
+#Week           3.0965  1    0.07846 .  
+#Tissue         9.2155  4    0.05593 .  
+#Cohort         5.5567  2    0.06214 .  
 
 
 
@@ -89,18 +90,18 @@ summary(betaI)
 AICtab(beta, beta2,beta3,beta4, gran, betaI)
 #      dAIC df
 #beta   0.0 10
-#beta3  0.3 9 
+#beta3  1.0 9 
 #gran   2.0 11
-#betaI 10.7 18
-#beta2 21.3 9 
-#beta4 24.9 8 
+#betaI 11.0 18
+#beta2 20.5 9 
+#beta4 25.6 8 
 
 #The full model -granuloma is the best
 
 
 #dispersion parameter
 sigma(beta)
-#30572.82
+#30717.49
 
 
 
