@@ -12,17 +12,11 @@ source("Rscripts/label_scientific.R")
 colors<-qualitative_hcl(6, palette="Dark3")
 
 SampleSheet<-read.csv("Data/SampleSheet_Mac251.csv", stringsAsFactors =F)
-stock<-SampleSheet[SampleSheet$Tissue=="stock_virus",]
 samples<-SampleSheet[SampleSheet$Monkey!="stock_virus",]
 
 summary<-read.csv("Output/Diversity_summary_R21.csv", stringsAsFactors = F, row.names = 1)
 Sum21<-summary[1:69,]
-stks<-summary[summary$filename=="Run_5_01_Animal_stock_virus",]
 Sum21<-merge(Sum21, samples[,c("filename","Granuloma","SIV.RNA.per.granuloma","SIV.RNA.per.tissue","CD4.percent","CD8.percent")], by="filename")
-
-
-#Remove SIV only 
-samples<-samples[samples$Cohort!="SIV only",]
 
 
 ### CD4/CD8 and diversity in Lung gran vs. non-gran
@@ -30,7 +24,7 @@ rna<-Sum21[,c("Cohort","Monkey","Tissue3","Week","mean","SIV.RNA.per.tissue",
                "CD4.percent","CD8.percent", "Granuloma")]
 
 #CD4
-cd4<-rna[!is.na(rna$CD4.percent),] #26 samples
+cd4<-rna[!is.na(rna$CD4.percent),] 
 colnames(cd4)[colnames(cd4)=="Tissue3"]<-"Tissue"
 
 #Lung/MtbR only
