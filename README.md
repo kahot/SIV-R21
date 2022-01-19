@@ -1,6 +1,7 @@
 # SIV-R21
 
 ## Analysis of SIV R21 SIV/Mtb Co-infection Study
+#### Link to our paper: [https://doi.org/10.3390/v14010048](https://doi.org/10.3390/v14010048)
 
 
 * Data directory contains sample information. SampleSheet_Mac251.csv has the most comprehensive sample information.
